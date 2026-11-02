@@ -1,0 +1,177 @@
+{
+  "corpus_path": "corpus/data/labelled-holdout.jsonl",
+  "corpus_sha256": "f317e99142e3c6ee5187ac04efe16e8babe9c8dfe35261ef22f28de0c93d9b4a",
+  "detector": "baseline",
+  "injection": {
+    "per_class_recall": {
+      "context_exfiltration": {
+        "caught": 0,
+        "planted": 21
+      },
+      "delimiter_forgery": {
+        "caught": 0,
+        "planted": 20
+      },
+      "encoding_evasion": {
+        "caught": 0,
+        "planted": 25
+      },
+      "instruction_override": {
+        "caught": 10,
+        "planted": 24
+      },
+      "refusal_suppression": {
+        "caught": 0,
+        "planted": 24
+      },
+      "role_reassignment": {
+        "caught": 9,
+        "planted": 20
+      },
+      "system_prompt_extraction": {
+        "caught": 8,
+        "planted": 18
+      }
+    },
+    "precision": {
+      "denominator": 40,
+      "numerator": 27
+    },
+    "recall": {
+      "denominator": 152,
+      "numerator": 27
+    },
+    "record_level": {
+      "false_positives_reading_as_quotation": 0,
+      "fn": 125,
+      "fp": 13,
+      "tn": 235,
+      "tp": 27
+    }
+  },
+  "phi": {
+    "covered_characters": {
+      "denominator": 4380,
+      "numerator": 650
+    },
+    "per_class": {
+      "account_numbers": {
+        "correct": 12,
+        "found": 12,
+        "missed": 0,
+        "spurious": 0
+      },
+      "certificate_or_license_numbers": {
+        "correct": 20,
+        "found": 20,
+        "missed": 0,
+        "spurious": 0
+      },
+      "dates_and_ages_over_89": {
+        "correct": 0,
+        "found": 0,
+        "missed": 43,
+        "spurious": 0
+      },
+      "device_identifiers": {
+        "correct": 0,
+        "found": 0,
+        "missed": 17,
+        "spurious": 0
+      },
+      "email_addresses": {
+        "correct": 0,
+        "found": 0,
+        "missed": 17,
+        "spurious": 0
+      },
+      "fax_numbers": {
+        "correct": 0,
+        "found": 0,
+        "missed": 10,
+        "spurious": 0
+      },
+      "geographic_subdivisions": {
+        "correct": 27,
+        "found": 27,
+        "missed": 0,
+        "spurious": 0
+      },
+      "health_plan_beneficiary_numbers": {
+        "correct": 10,
+        "found": 10,
+        "missed": 0,
+        "spurious": 0
+      },
+      "ip_addresses": {
+        "correct": 0,
+        "found": 0,
+        "missed": 12,
+        "spurious": 0
+      },
+      "medical_record_numbers": {
+        "correct": 18,
+        "found": 18,
+        "missed": 0,
+        "spurious": 0
+      },
+      "names": {
+        "correct": 0,
+        "found": 0,
+        "missed": 34,
+        "spurious": 0
+      },
+      "social_security_numbers": {
+        "correct": 0,
+        "found": 0,
+        "missed": 14,
+        "spurious": 0
+      },
+      "telephone_numbers": {
+        "correct": 0,
+        "found": 0,
+        "missed": 17,
+        "spurious": 0
+      },
+      "unknown": {
+        "correct": 0,
+        "found": 0,
+        "missed": 0,
+        "spurious": 15
+      },
+      "vehicle_identifiers": {
+        "correct": 0,
+        "found": 0,
+        "missed": 10,
+        "spurious": 0
+      },
+      "web_urls": {
+        "correct": 12,
+        "found": 12,
+        "missed": 8,
+        "spurious": 0
+      }
+    },
+    "precision": {
+      "denominator": 114,
+      "numerator": 99
+    },
+    "recall": {
+      "denominator": 281,
+      "numerator": 99
+    },
+    "totals": {
+      "correct": 99,
+      "found": 99,
+      "missed": 182,
+      "spurious": 15
+    }
+  },
+  "policy": {
+    "declared_omissions": 3,
+    "enforced": 15,
+    "enumerated": 18
+  },
+  "rows": 400,
+  "slice": "holdout"
+}
