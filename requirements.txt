@@ -1,0 +1,7 @@
+# The service and the detectors import nothing outside the standard library.
+# That is deliberate. The thing worth getting right first is the decision, and
+# a dependency that has to be installed before anything can be graded makes the
+# suite unrunnable on a fresh clone.
+#
+# Minimum interpreter is 3.10. Nothing here uses a 3.11 feature and the machine
+# this was measured on runs 3.10.12.
