@@ -9,6 +9,7 @@ deliberately ignores do not add up to the regulation's list.
 pip install -r requirements-dev.txt
 python -m gateway.app --port 8080
 curl -s localhost:8080/v1/guard -d '{"text":"Patient: Rosa Delacroix, MRN 884213"}'
+curl -sN localhost:8080/v1/guard/stream -d '{"text":"Patient: Rosa Delacroix, MRN 884213"}'
 ```
 
 ## How a request moves through it
@@ -94,6 +95,35 @@ and this paragraph is not a measurement error. Both are correct and they
 measure different things. `docs/evasion.md` groups the twenty by what they
 exploit and only one of the four groups is a pattern problem.
 
+## Redacting a streamed response
+
+A completion arrives a few tokens at a time and redacting each chunk on its own
+leaks every identifier that straddles a boundary. `gateway/stream.py` holds the
+tail back until enough has followed it to decide, and `/v1/guard/stream` is the
+same guardrail over a chunked response.
+
+```
+python scripts/stream_sweep.py --out measurements/stream-buffers.json
+```
+
+The plan for this called the buffer one number. It is three. The second one is
+where the identifiers go and the third one is what stops a single long link
+turning one request into a scan that is quadratic in its own length.
+
+```
+holdback  lookbehind  leaked  diverged
+      64           0     124        34
+      64           4      60        28
+      64           8      51        28
+      64          16       0         1
+```
+
+A holdback of 64 characters is twice what the leak curve needs on its own and
+it still loses 124 of 281 identifiers when nothing of the already emitted text
+stays in the matching window. Most of the enforced classes are labelled, and a
+label that has already gone out to the reader cannot introduce the value that
+follows it. The full curves and the measured cost are in `docs/streaming.md`.
+
 ## Known limitations
 
 - **9 of the 9 missed identifiers are the same case.** A five digit
@@ -118,8 +148,17 @@ exploit and only one of the four groups is a pattern problem.
   is the shape of a clinical timestamp and of an address, and the pattern took
   both while splitting a real compressed address in half. Fixed, and the
   negatives that should have caught it are in the set now.
-- **Nothing here has run under load.** There is no latency figure and no
-  throughput figure, so the cost of the guardrail is unmeasured.
+- **Streaming costs about 48 times the whole body redactor** over the same
+  text, because the patterns are re-run on every chunk. Draining less often
+  would cut it and would also move the leak curve, so it is a third dimension
+  and nothing has measured it.
+- **The lookbehind keeps unredacted text in memory after the reader has it.**
+  The window is bounded by the lookbehind rather than by the response length,
+  and it is still raw identifiers sitting in a buffer.
+- **Nothing here has run under load.** The cost figures are single process and
+  sequential, so there is no concurrency figure and no throughput figure.
+- **Nothing rate limits.** One request at `MAX_BODY` holds a core for about
+  seven tenths of a second and detection cost is linear in payload size.
 
 ## What I would do differently
 
@@ -133,10 +172,10 @@ lines and it should have been the first thing built rather than the last.
 
 ```
 gateway/      policy enumeration, detectors, the request decision, HTTP front door
-corpus/       the seeded generator and the two labelled slices
-scripts/      scoring, the evasion pass
+corpus/       the seeded generator, the two labelled slices, response bodies
+scripts/      scoring, the evasion pass, the buffer sweep and its cost arms
 measurements/ counts manifests, one per scored run
-docs/         the scoring rules, the declared omissions, the evasion results
+docs/         the scoring rules, the declared omissions, evasion and streaming
 terraform/    budget alert for the cloud work
 ```
 
