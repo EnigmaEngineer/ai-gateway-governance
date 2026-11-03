@@ -1,0 +1,151 @@
+{
+  "bodies": 35,
+  "bodies_not_graded_as_a_stream": 0,
+  "body_target_chars": 900,
+  "by_holdback": [
+    {
+      "bodies_diverged": 35,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 0,
+      "leaked_spans": 252,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 35,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 2,
+      "leaked_spans": 202,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 35,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 4,
+      "leaked_spans": 157,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 33,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 8,
+      "leaked_spans": 100,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 16,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 16,
+      "leaked_spans": 22,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 0,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 32,
+      "leaked_spans": 0,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 0,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 48,
+      "leaked_spans": 0,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 0,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 64,
+      "leaked_spans": 0,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 0,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 96,
+      "leaked_spans": 0,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 0,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 128,
+      "leaked_spans": 0,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    }
+  ],
+  "by_lookbehind": [
+    {
+      "bodies_diverged": 34,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 64,
+      "leaked_spans": 124,
+      "lookbehind_chars": 0,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 28,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 64,
+      "leaked_spans": 60,
+      "lookbehind_chars": 4,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 28,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 64,
+      "leaked_spans": 51,
+      "lookbehind_chars": 8,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 1,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 64,
+      "leaked_spans": 0,
+      "lookbehind_chars": 16,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 0,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 64,
+      "leaked_spans": 0,
+      "lookbehind_chars": 32,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 0,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 64,
+      "leaked_spans": 0,
+      "lookbehind_chars": 64,
+      "oracle_spans": 281
+    },
+    {
+      "bodies_diverged": 0,
+      "bodies_not_graded_as_a_stream": 0,
+      "holdback_chars": 64,
+      "leaked_spans": 0,
+      "lookbehind_chars": 128,
+      "oracle_spans": 281
+    }
+  ],
+  "corpus_path": "corpus/data/labelled-holdout.jsonl",
+  "corpus_sha256": "f317e99142e3c6ee5187ac04efe16e8babe9c8dfe35261ef22f28de0c93d9b4a",
+  "note": "Bodies are holdout rows joined to completion length. The rows are requests and a request is not a response, so the join is a stand in for response shape and the figures are about chunking rather than about detection quality.",
+  "oracle_spans_total": 281,
+  "rows_left_over_after_the_last_body": 7,
+  "token_chars": 4
+}
