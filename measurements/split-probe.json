@@ -1,0 +1,111 @@
+{
+  "attempts": 8,
+  "controls": {
+    "no_buffer_at_all_leaks_the_control": true,
+    "shipped_setting_catches_the_control": true,
+    "the_control_was_graded_as_a_stream": true
+  },
+  "detail": [
+    {
+      "cut_count": 97,
+      "exploits": "a url longer than the holdback, so its head emits before the tail arrives",
+      "got_through": false,
+      "graded_as_a_stream": true,
+      "leaked_classes": [],
+      "leaked_span_count": 0,
+      "matches_whole_body_redactor": true,
+      "name": "long_url",
+      "tag_count": 1,
+      "whole_body_tag_count": 1
+    },
+    {
+      "cut_count": 90,
+      "exploits": "an address longer than the holdback with no matchable prefix",
+      "got_through": false,
+      "graded_as_a_stream": true,
+      "leaked_classes": [],
+      "leaked_span_count": 0,
+      "matches_whole_body_redactor": true,
+      "name": "long_email",
+      "tag_count": 1,
+      "whole_body_tag_count": 1
+    },
+    {
+      "cut_count": 76,
+      "exploits": "the cut falls between the label and the digits it introduces",
+      "got_through": false,
+      "graded_as_a_stream": true,
+      "leaked_classes": [],
+      "leaked_span_count": 0,
+      "matches_whole_body_redactor": true,
+      "name": "label_then_value",
+      "tag_count": 1,
+      "whole_body_tag_count": 1
+    },
+    {
+      "cut_count": 75,
+      "exploits": "the cut falls inside the group separator of a social security number",
+      "got_through": false,
+      "graded_as_a_stream": true,
+      "leaked_classes": [],
+      "leaked_span_count": 0,
+      "matches_whole_body_redactor": true,
+      "name": "ssn_midpoint",
+      "tag_count": 1,
+      "whole_body_tag_count": 1
+    },
+    {
+      "cut_count": 76,
+      "exploits": "the cut falls between the title and the surname",
+      "got_through": false,
+      "graded_as_a_stream": true,
+      "leaked_classes": [],
+      "leaked_span_count": 0,
+      "matches_whole_body_redactor": true,
+      "name": "name_after_title",
+      "tag_count": 1,
+      "whole_body_tag_count": 1
+    },
+    {
+      "cut_count": 83,
+      "exploits": "two identifiers sit together and the second one straddles the edge",
+      "got_through": false,
+      "graded_as_a_stream": true,
+      "leaked_classes": [],
+      "leaked_span_count": 0,
+      "matches_whole_body_redactor": true,
+      "name": "two_in_one_chunk",
+      "tag_count": 2,
+      "whole_body_tag_count": 2
+    },
+    {
+      "cut_count": 83,
+      "exploits": "a street address is long and has no prefix that matches on its own",
+      "got_through": false,
+      "graded_as_a_stream": true,
+      "leaked_classes": [],
+      "leaked_span_count": 0,
+      "matches_whole_body_redactor": true,
+      "name": "address_run",
+      "tag_count": 1,
+      "whole_body_tag_count": 1
+    },
+    {
+      "cut_count": 82,
+      "exploits": "a compressed address cut at the double colon looks like two timestamps",
+      "got_through": false,
+      "graded_as_a_stream": true,
+      "leaked_classes": [],
+      "leaked_span_count": 0,
+      "matches_whole_body_redactor": true,
+      "name": "ipv6_colons",
+      "tag_count": 1,
+      "whole_body_tag_count": 1
+    }
+  ],
+  "diverged_from_whole_body_redactor": 0,
+  "got_through": 0,
+  "holdback_chars": 64,
+  "lookbehind_chars": 128,
+  "note": "Cuts chosen with the implementation open, so this is a lower bound on the leak rate and not an estimate of it."
+}
