@@ -89,6 +89,13 @@ def test_the_evasion_counts_are_the_measured_ones(root, manifests):
         "the README says twenty got through and the manifest says %d" % through)
 
 
+def test_the_attack_class_count_in_the_diagram_matches_the_detector(root):
+    """The diagram publishes a count and the block gate cannot grade a drawing."""
+    from gateway import injection
+    text = (root / "README.md").read_text(encoding="utf-8")
+    assert "%d attack classes" % len(injection.CLASSES) in text
+
+
 def test_the_class_counts_in_the_diagram_match_the_policy_module(root):
     text = readme(root)
     assert "%d enforced classes" % len(policy.ENFORCED) in text

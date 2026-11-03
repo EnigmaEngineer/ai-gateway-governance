@@ -69,3 +69,31 @@ def test_the_scored_slice_is_not_the_slice_the_patterns_were_written_against(man
     dev = manifests["development-patterns"]["corpus_sha256"]
     hold = manifests["holdout-patterns"]["corpus_sha256"]
     assert dev != hold, "both slices hash the same, so nothing is held out"
+
+
+def test_the_split_probe_controls_fired(manifests):
+    """One cut the shipped setting must survive and one it must fail."""
+    controls = manifests["split-probe"]["controls"]
+    assert all(controls.values()), "a control did not fire, so the pass graded nothing: %r" % controls
+
+
+def test_the_buffer_sweep_graded_streams_and_not_closes(manifests):
+    m = manifests["stream-buffers"]
+    assert m["oracle_spans_total"] > 0, "no identifiers in the bodies, so a zero leak count means nothing"
+    assert m["bodies_not_graded_as_a_stream"] == 0, (
+        "%d bodies never reached the emit point, so those arms graded the whole body redactor"
+        % m["bodies_not_graded_as_a_stream"])
+
+
+def test_a_wider_buffer_never_leaks_more(manifests):
+    for key in ("by_holdback", "by_lookbehind"):
+        arms = manifests["stream-buffers"][key]
+        counts = [a["leaked_spans"] for a in arms]
+        assert counts == sorted(counts, reverse=True), (
+            "%s is not monotone, which means the sweep or the redactor is wrong: %r" % (key, counts))
+
+
+def test_the_sweep_still_has_a_leaking_arm_to_compare_against(manifests):
+    """A sweep where every arm is clean has stopped measuring anything."""
+    arms = manifests["stream-buffers"]["by_holdback"] + manifests["stream-buffers"]["by_lookbehind"]
+    assert any(a["leaked_spans"] > 0 for a in arms)
