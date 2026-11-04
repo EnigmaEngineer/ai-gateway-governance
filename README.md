@@ -124,6 +124,61 @@ stays in the matching window. Most of the enforced classes are labelled, and a
 label that has already gone out to the reader cannot introduce the value that
 follows it. The full curves and the measured cost are in `docs/streaming.md`.
 
+## The token budget, and what deciding early costs
+
+A gateway says yes or no before it knows what a request will cost. Admission
+charges an estimate and reconciliation replaces it with the usage the provider
+reported, so a tenant can finish a window having spent more than its budget.
+The amount is a quantity the design owns rather than a bug.
+
+Measured against 240 held out bodies on a budget of 6,808 tokens. The load ran
+at 16 concurrent callers over three repeats.
+
+```
+  prompt_estimator_short_by_tokens          882 to    891, median    882 over 3 runs
+  forecast_short_by_tokens                 3478 to   3507, median   3478 over 3 runs
+  overshoot_under_forecast_tokens           117 to    171, median    117 over 3 runs
+```
+
+Reserving the whole declared output ceiling is sound and it holds budget the
+caller will not use. Forecasting a quarter of it took the shortfall from about
+882 tokens to about 3,478. The shortfall is a sum over every settled request
+and it barely moves. The overshoot is one number off one interleaving and it
+moves by multiples, so both are published as a spread.
+
+Under the ceiling policy the estimator was short by about 882 tokens and the
+budget was overspent by nought, because 67 of the 240 bodies are blocked by the
+injection filter and each hands its whole reservation back unspent. That slack
+belongs to the traffic and not to the quota.
+
+**Dropping the critical section around the counter is free in one process and
+total the moment the counter is a network hop away.** Two callers read the same
+counter and each writes its own total over the other's, so the reservation
+never accumulates. How often that happens is a function of how far apart the
+read and the write are, so the load run sweeps that width with a locked control
+at each one.
+
+```
+  round trip 0        admitted without the lock  177  with it  176
+  round trip 0.0002   admitted without the lock  238  with it  177
+  round trip 0.0005   admitted without the lock  240  with it  175
+  round trip 0.002    admitted without the lock  240  with it  176
+```
+
+With no artificial window the unserialised arm admits about what the locked one
+admits. Open two tenths of a millisecond, which is less than any shared counter
+costs, and the quota stops refusing almost anything. The first draft of this
+section said the lock was load bearing full stop. The sweep is the only reason
+it does not say that.
+
+Detection is linear in payload size, so `Admission` caps how many requests are
+in it at once and refuses rather than queues. Caps of 2, 4, 8 and 16 at 16
+workers take the served median from 27.6 ms to 140.1 ms on two cores. Anything
+below 16 refuses about nine requests in ten. That is a step and the harness put
+it there, because a closed loop generator with 16 workers offers 16 concurrent
+requests and no more. The sweep says what a cap costs and cannot
+choose one. `docs/quota.md` carries the tables and the argument.
+
 ## Known limitations
 
 - **9 of the 9 missed identifiers are the same case.** A five digit
@@ -155,10 +210,20 @@ follows it. The full curves and the measured cost are in `docs/streaming.md`.
 - **The lookbehind keeps unredacted text in memory after the reader has it.**
   The window is bounded by the lookbehind rather than by the response length,
   and it is still raw identifiers sitting in a buffer.
-- **Nothing here has run under load.** The cost figures are single process and
-  sequential, so there is no concurrency figure and no throughput figure.
-- **Nothing rate limits.** One request at `MAX_BODY` holds a core for about
-  seven tenths of a second and detection cost is linear in payload size.
+- **The admission limit has no number behind it.** The sweep is a step at the
+  load generator's worker count, so it says what a cap costs and not what the
+  cap should be. That needs an open loop generator with an arrival rate.
+- **`MAX_BODY` is still a megabyte and nothing measured what a real payload
+  needs.** The largest body either corpus slice carries is 233 characters,
+  which is a fact about a generator. Lowering the limit to make the worst case
+  look better would be choosing a bound from the sample it is judged on.
+- **The reference tokeniser never merges, so it is at least as dear as the
+  character rule on every input.** A real vocabulary is cheaper on long common
+  words, so every shortfall figure here is a bound on what a real tokeniser
+  would disagree by rather than a prediction of it.
+- **The upstream honours the output ceiling and the quota window never
+  rolls.** So one term of the overshoot is absent, and a budget is a counter
+  with no clock on it, no refill and no sliding window.
 
 ## What I would do differently
 
@@ -171,11 +236,11 @@ lines and it should have been the first thing built rather than the last.
 ## Layout
 
 ```
-gateway/      policy enumeration, detectors, the request decision, HTTP front door
+gateway/      policy enumeration, detectors, the request decision, the quota, HTTP front door
 corpus/       the seeded generator, the two labelled slices, response bodies
-scripts/      scoring, the evasion pass, the buffer sweep and its cost arms
+scripts/      scoring, the evasion pass, the buffer sweep, the quota load run
 measurements/ counts manifests, one per scored run
-docs/         the scoring rules, the declared omissions, evasion and streaming
+docs/         the scoring rules, the declared omissions, evasion, streaming, the quota
 terraform/    budget alert for the cloud work
 ```
 
