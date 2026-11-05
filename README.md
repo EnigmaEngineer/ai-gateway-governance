@@ -233,21 +233,45 @@ was wrong. It took freezing the patterns and attacking them on purpose to find
 out that the figure was an upper bound. The evasion pass costs about forty
 lines and it should have been the first thing built rather than the last.
 
+## Where it runs
+
+A private GKE cluster and the gateway behind an internal load balancer, in
+`terraform/` and `helm/`. None of it has been applied, because there is no
+project yet.
+
+`terraform validate` and `helm lint` both pass without credentials and neither
+can see a configuration that is valid and wrong. So the chart is rendered at
+all 32 combinations of the five values that decide whether the gateway is
+exposed, in three arms, and every rendering is graded.
+
+```
+                                   rendered  refused  findings  exposed and unacknowledged
+  the chart as it stands                  5       27         4                           0
+  without the acknowledgements            8       24         8                           2
+  with the refusal block emptied         32        0        64                           8
+```
+
+The middle arm is the chart's own refusal as it was first written. It caught
+every empty value and let through two renderings with a public address,
+because the value that exposes the service ships as `true` rather than empty.
+
+The detector sits in front of the proxy, not behind it as a webhook. Portkey
+takes the webhook's address from an account in its own application or from a
+request header, so a detector behind it runs when the caller asks for it.
+`docs/infrastructure.md` has that, and the three environment variables the
+first chart invented.
+
 ## Layout
 
 ```
 gateway/      policy enumeration, detectors, the request decision, the quota, HTTP front door
 corpus/       the seeded generator, the two labelled slices, response bodies
-scripts/      scoring, the evasion pass, the buffer sweep, the quota load run
+scripts/      scoring, the evasion pass, the buffer sweep, the quota load run, the render sweep
 measurements/ counts manifests, one per scored run
-docs/         the scoring rules, the declared omissions, evasion, streaming, the quota
-terraform/    budget alert for the cloud work
+docs/         scoring, declared omissions, evasion, streaming, the quota, the cluster
+terraform/    budget alert, network, private cluster, the two identities
+helm/         Portkey and the guardrail in one pod, behind an internal load balancer
 ```
-
-The budget alert is written and validated and not applied. `terraform init
--backend=false` and `terraform validate` and `terraform fmt -check` all pass
-without credentials, which is as far as a configuration can be graded before
-the project exists.
 
 
 Nothing in `corpus/data` came from a real record. Every value is generated, so
