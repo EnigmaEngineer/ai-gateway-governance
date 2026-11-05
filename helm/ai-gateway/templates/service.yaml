@@ -1,0 +1,33 @@
+{{- include "ai-gateway.require" . }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ai-gateway.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "ai-gateway.labels" . | nindent 4 }}
+  annotations:
+  {{- if .Values.service.internal }}
+    # This one annotation is the whole difference between a gateway on the VPC
+    # and a gateway on the internet. Without it GKE provisions an external
+    # forwarding rule with a public address, and the Service still reports
+    # healthy.
+    networking.gke.io/load-balancer-type: "Internal"
+    networking.gke.io/internal-load-balancer-allow-global-access: "false"
+  {{- else }}
+    # Rendered on purpose by the sweep so the exposed case can be graded. No
+    # values file in this repository sets it.
+    ai-gateway.local/exposure: "external"
+  {{- end }}
+spec:
+  type: LoadBalancer
+  # The detector is what the load balancer targets. The proxy's own port is
+  # deliberately absent, because a caller that can reach the proxy directly
+  # has gone round the thing this repository is for.
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: guardrail
+      protocol: TCP
+  selector:
+    {{- include "ai-gateway.selectorLabels" . | nindent 4 }}

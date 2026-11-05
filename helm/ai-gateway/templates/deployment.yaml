@@ -1,0 +1,123 @@
+{{- include "ai-gateway.require" . }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ai-gateway.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "ai-gateway.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ai-gateway.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ai-gateway.labels" . | nindent 8 }}
+      annotations:
+        # A values change that only touches the config map would otherwise
+        # leave the running pods on the old config until something else
+        # restarted them.
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      # Spread across zones. Two replicas in one zone is one zone of
+      # availability wearing the number two.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "ai-gateway.selectorLabels" . | nindent 14 }}
+      containers:
+        # The guardrail is first because it is first on the request path. The
+        # load balancer targets this container and it forwards to the proxy on
+        # loopback. The other order was built first and it does not work, and
+        # the reason is in docs/infrastructure.md.
+        - name: guardrail
+          image: "{{ .Values.guardrail.image }}:{{ .Values.guardrail.tag }}"
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--host"
+            # Every interface, because the load balancer reaches this one from
+            # outside the pod now.
+            - "0.0.0.0"
+            - "--port"
+            - {{ .Values.guardrail.port | quote }}
+            - "--upstream"
+            - "http://127.0.0.1:{{ .Values.portkey.port }}/v1/chat/completions"
+          ports:
+            - name: guardrail
+              containerPort: {{ .Values.guardrail.port }}
+          resources:
+            {{- toYaml .Values.guardrail.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: guardrail
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: guardrail
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+        - name: portkey
+          image: "{{ .Values.portkey.image }}:{{ .Values.portkey.tag }}"
+          imagePullPolicy: IfNotPresent
+          # No environment here on purpose. The reference deployment in the
+          # gateway's own repository sets none, its compose file sets none,
+          # and its port is hardcoded at 8787 in both. The first version of
+          # this chart set PORT, GUARDRAIL_URL and PROVIDER_API_KEY, and not
+          # one of the three is a variable the image reads.
+          ports:
+            - name: portkey
+              containerPort: {{ .Values.portkey.port }}
+          # The provider credentials live in the config file the gateway
+          # reads, under integrations with a credentials block per provider.
+          # TODO: the path below is unverified. The example config in the
+          # gateway's repository does not say where the process loads it
+          # from, so this mount is a guess at the filename and has to be
+          # checked against a container that has actually started before
+          # anything here is called working.
+          volumeMounts:
+            - name: gateway-config
+              mountPath: /app/conf.json
+              subPath: conf.json
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            {{- toYaml .Values.portkey.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            tcpSocket:
+              port: portkey
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: gateway-config
+          secret:
+            secretName: {{ .Values.providerKeySecret.name }}
+            items:
+              - key: {{ .Values.providerKeySecret.key }}
+                path: conf.json

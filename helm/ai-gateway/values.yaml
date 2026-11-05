@@ -1,0 +1,93 @@
+# Two containers in one pod. The guardrail is what callers reach and it
+# forwards to the proxy on loopback. They share a pod rather than sitting in
+# two Deployments because both are on the request path and a network hop per
+# request is latency the quota measurement would have to carry.
+#
+# The first version of this had the proxy in front and the guardrail behind
+# it as a webhook. That does not enforce anything, and docs/infrastructure.md
+# has the reason.
+
+namespace: ai-gateway
+serviceAccount:
+  name: ai-gateway
+  # Filled from the terraform output workload_service_account. Empty means no
+  # workload identity, and the chart refuses to render rather than falling
+  # back to the node identity.
+  gcpServiceAccount: ""
+
+replicaCount: 2
+
+service:
+  # The only value in this file that decides whether the gateway is on the
+  # internet. See the render sweep in docs/infrastructure.md.
+  internal: true
+  # The port callers use. It fronts the guardrail, not the proxy.
+  # Setting internal to false alone does not render. An external gateway is a
+  # decision somebody makes on purpose, so it takes two values rather than
+  # one, and neither of them is the sort of thing a copied values file
+  # carries by accident.
+  acknowledgeInternetExposure: false
+  port: 8080
+
+portkey:
+  image: docker.io/portkeyai/gateway
+  tag: "1.9.4"
+  # Hardcoded in the gateway's own compose file and in its reference
+  # Kubernetes manifest, in both the container port and the service port.
+  # Nothing documented changes it, so this value is a fact about the image
+  # rather than a setting.
+  port: 8787
+  resources:
+    requests:
+      cpu: 100m
+      memory: 192Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+guardrail:
+  # Built from this repository. There is no registry yet and no image has ever
+  # been pushed, so this is the name the build would use.
+  image: ""
+  tag: ""
+  port: 8080
+  # Carried from gateway/app.py rather than retyped. A value here that
+  # disagrees with the module is a configuration that is valid and wrong,
+  # which is what tests/test_infra.py grades.
+  streamHoldbackChars: 64
+  streamLookbehindChars: 128
+  resources:
+    requests:
+      cpu: 250m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 256Mi
+
+providerKeySecret:
+  # The proxy reads provider credentials out of a JSON config file, under an
+  # integrations list with a credentials block per provider. So the secret
+  # holds that whole file rather than a bare key, and it is mounted rather
+  # than put in the environment.
+  #
+  # In a real deployment the value arrives from Secret Manager through the
+  # CSI driver. There is no project yet, so there is no secret and no driver,
+  # and the chart names the secret rather than creating it.
+  name: ai-gateway-gateway-config
+  key: conf.json
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+networkPolicy:
+  enabled: true
+  # Ranges allowed to reach the gateway. Empty means the policy allows the
+  # whole cluster, which the chart treats as an error rather than a default.
+  callerCidrs: []
+  # Turning the policy off is the same shape of decision as exposing the
+  # service, so it takes the same second value.
+  acknowledgeClusterWideAccess: false

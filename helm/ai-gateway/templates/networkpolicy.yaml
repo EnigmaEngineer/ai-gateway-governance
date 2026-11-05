@@ -1,0 +1,28 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- include "ai-gateway.require" . }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "ai-gateway.name" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "ai-gateway.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "ai-gateway.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  # The proxy listens on the pod address and nothing can change that, so this
+  # policy is what stops a pod in the cluster reaching it and skipping the
+  # detector. Only the detector's port is allowed in.
+  ingress:
+    - from:
+      {{- range .Values.networkPolicy.callerCidrs }}
+        - ipBlock:
+            cidr: {{ . | quote }}
+      {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.guardrail.port }}
+{{- end }}

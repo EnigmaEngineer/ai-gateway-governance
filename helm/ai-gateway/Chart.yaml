@@ -1,0 +1,8 @@
+apiVersion: v2
+name: ai-gateway
+description: Portkey in front of the guardrail, behind an internal load balancer.
+type: application
+version: 0.1.0
+# Portkey's open source gateway. Pinned rather than following a tag, because
+# the thing in front of every request is not a thing to let move on its own.
+appVersion: "1.9.4"
