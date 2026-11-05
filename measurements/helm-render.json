@@ -1,0 +1,1661 @@
+{
+  "arms": [
+    {
+      "arm": "guarded",
+      "documents": 5,
+      "findings": [],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "documents": 5,
+      "findings": [],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): networkPolicy.enabled is false, so every pod in the cluster can reach the gateway. Set networkPolicy.acknowledgeClusterWideAcc",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): service.internal is false, which gives this gateway a public address. Set service.acknowledgeInternetExposure to true if that ",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): service.internal is false, which gives this gateway a public address. Set service.acknowledgeInternetExposure to true if that ",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 5,
+      "findings": [],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 5,
+      "findings": [],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a container image has no name"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a container image has no name"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a container image has no name",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a container image has no name",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "workload_identity_set": false
+      }
+    }
+  ],
+  "combinations": 32,
+  "dimensions": {
+    "exposure_acknowledged": [
+      "true",
+      "false"
+    ],
+    "guardrail_image_set": [
+      "true",
+      "false"
+    ],
+    "networkPolicy.enabled": [
+      "true",
+      "false"
+    ],
+    "service.internal": [
+      "true",
+      "false"
+    ],
+    "workload_identity_set": [
+      "true",
+      "false"
+    ]
+  },
+  "distinct_finding_count": 4,
+  "distinct_findings": [
+    "a LoadBalancer Service with no internal annotation, which gets a public address",
+    "a container image has no name",
+    "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+    "the service account carries no workload identity annotation, so pods hold the node identity"
+  ],
+  "guard_stubbed": {
+    "exposed_renderings_nobody_acknowledged": 8,
+    "findings_total": 64,
+    "refused": 0,
+    "rendered": 32,
+    "renderings_with_a_finding": 30
+  },
+  "guard_without_acknowledgements": {
+    "exposed_renderings_nobody_acknowledged": 2,
+    "findings_total": 8,
+    "refused": 24,
+    "rendered": 8,
+    "renderings_with_a_finding": 6
+  },
+  "guarded": {
+    "exposed_renderings_nobody_acknowledged": 0,
+    "findings_total": 4,
+    "refused": 27,
+    "rendered": 5,
+    "renderings_with_a_finding": 3
+  },
+  "helm_version": "v3.16.3+gcfd0749"
+}
