@@ -115,3 +115,26 @@ variable "guardrail_port" {
   type        = number
   default     = 8080
 }
+
+variable "apigee_peering_cidr" {
+  description = "Range Apigee peers into the VPC for its runtime. Must not overlap the node, pod, service or master ranges."
+  type        = string
+  default     = "10.30.0.0/22"
+
+  # The instance schema says the block is length 22. This block refuses
+  # anything else, and `terraform validate` DOES NOT RUN IT. Measured: a
+  # variable carrying an always false validation passes validate with
+  # Success and only plan reports it. So on a day with no credentials, when
+  # validate is the only terraform command available, this guard grades
+  # nothing. tests/test_apigee.py asserts the /22 instead, because the suite
+  # runs on a clone with no cloud at all.
+  validation {
+    condition     = can(cidrhost(var.apigee_peering_cidr, 0)) && tonumber(split("/", var.apigee_peering_cidr)[1]) == 22
+    error_message = "Apigee takes a block of length 22. Give a.b.c.d/22."
+  }
+}
+
+variable "apigee_hostnames" {
+  description = "Hostnames the environment group answers on. No default, because a default here is a guess about somebody's domain and an environment group with the wrong hostname is deployed and unreachable."
+  type        = list(string)
+}
