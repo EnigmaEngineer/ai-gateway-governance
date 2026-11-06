@@ -276,3 +276,32 @@ helm/         Portkey and the guardrail in one pod, behind an internal load bala
 
 Nothing in `corpus/data` came from a real record. Every value is generated, so
 the labelled slices are committed whole rather than withheld.
+
+## The Apigee layer
+
+One governed front door in front of the guardrail, as an Apigee X proxy bundle
+in `apiproxy/` and its infrastructure in `terraform/apigee.tf`. Nothing is
+applied, because there is no GCP project yet.
+
+Most of an Apigee policy's security behaviour is decided by elements you leave
+out. A `Quota` with no `Distributed` counts per message processor, so a budget
+of 2000 is 2000 times the processor count. A `VerifyJWT` with no `Issuer`
+verifies a signature and nothing about who signed it. A `ResponseCache` with
+no caller in its key serves one tenant's completion to another. All three
+deploy and `terraform validate` cannot see any of them.
+
+So `apigee/semantics.py` carries 23 documented defaults, each with the sentence
+it came from and its URL, and `scripts/policy_check.py` refuses to write a rule
+on a default that is not in there. `scripts/bundle_sweep.py` then breaks the
+bundle 19 ways, one per rule, and fails if any rule does not fire or if any
+rule has no arm built to trip it. With every control stripped at once the
+checker reports 14 findings over 12 distinct rules.
+
+`VerifyJWT` is the sharpest one. Expiry is checked only when the claim is
+present, and the element that could require a claim refuses registered names,
+`exp` among them. So the policy admits a token that never expires and has no
+setting that refuses it. `RF-NoExpiry` is a separate step for that reason.
+
+The argument is in `docs/apigee.md` with the 23 sourced quotes. It also carries
+the three questions the vendor's pages did not answer and why these are Edge
+pages rather than X pages.
