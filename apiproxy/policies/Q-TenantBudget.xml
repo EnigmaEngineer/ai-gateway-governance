@@ -1,0 +1,26 @@
+<!--
+  Distributed and Synchronous are both set true and both default to false.
+
+  With Distributed false the quota page says you might exceed your quota,
+  because the count is not shared between message processors. With Synchronous
+  false the counter updates asynchronously on a default ten second interval,
+  and the page says some calls exceeding the quota will go through. So a
+  budget of 2000 an hour, written with neither element, is 2000 per processor
+  plus whatever arrives inside a ten second window. The file says 2000 and
+  neither of those numbers is 2000.
+
+  Synchronous true costs a round trip per request. That is the trade and it is
+  the right one here, because the budget is a spend control on a paid model
+  provider rather than a fairness control.
+-->
+<Quota async="false" continueOnError="false" enabled="true" name="Q-TenantBudget" type="rollingwindow">
+    <DisplayName>Tenant token budget</DisplayName>
+    <Allow count="2000"/>
+    <Interval>1</Interval>
+    <TimeUnit>hour</TimeUnit>
+    <!-- Without this, the page says a single counter is applied against the
+         quota, so every tenant shares one budget. -->
+    <Identifier ref="jwt.VJ-Tenant.decoded.claim.sub"/>
+    <Distributed>true</Distributed>
+    <Synchronous>true</Synchronous>
+</Quota>

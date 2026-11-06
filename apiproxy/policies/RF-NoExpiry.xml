@@ -1,0 +1,15 @@
+<!--
+  Refuses a token carrying no exp claim. This exists because VerifyJWT cannot.
+  See VJ-Tenant.xml for the two sentences that make it necessary.
+-->
+<RaiseFault async="false" continueOnError="false" enabled="true" name="RF-NoExpiry">
+    <DisplayName>Refuse a token with no expiry</DisplayName>
+    <FaultResponse>
+        <Set>
+            <StatusCode>401</StatusCode>
+            <ReasonPhrase>Unauthorized</ReasonPhrase>
+            <Payload contentType="application/json">{"error":"token carries no exp claim"}</Payload>
+        </Set>
+    </FaultResponse>
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+</RaiseFault>

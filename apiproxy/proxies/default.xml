@@ -1,0 +1,84 @@
+<!--
+  Every control sits in the PreFlow and nothing security bearing sits in a
+  conditional flow. That is not a style choice, it is the only arrangement
+  whose enforcement can be read off the file.
+
+  The flows documentation says three things. Policies on the PreFlow are
+  always executed. A conditional flow's policies run only when its condition
+  is true. One conditional flow runs per segment and it is the first whose
+  condition is true. So a control attached to a conditional flow is a control
+  some requests skip, and which requests depends on the flows above it.
+
+  The conditional flows below therefore carry routing and nothing else. Adding
+  a Step to one is what scripts/policy_check.py refuses.
+-->
+<ProxyEndpoint name="default">
+    <PreFlow name="PreFlow">
+        <Request>
+            <!-- Arrest before verification so an unauthenticated flood costs
+                 a signature check rather than a key lookup. -->
+            <Step>
+                <Name>SA-PerClient</Name>
+            </Step>
+            <Step>
+                <Name>VJ-Tenant</Name>
+            </Step>
+            <!-- VerifyJWT checks expiry only if the claim is present, and its
+                 AdditionalClaims element refuses registered names, so exp
+                 cannot be required there. This step is how a token with no
+                 expiry is refused. -->
+            <Step>
+                <Name>RF-NoExpiry</Name>
+                <Condition>jwt.VJ-Tenant.decoded.claim.exp = null</Condition>
+            </Step>
+            <Step>
+                <Name>OA-VerifyToken</Name>
+            </Step>
+            <Step>
+                <Name>Q-TenantBudget</Name>
+            </Step>
+            <!-- The guardrail is the service built on days 1 to 3. It runs on
+                 every request because it is in the PreFlow. -->
+            <Step>
+                <Name>SC-Guardrail</Name>
+            </Step>
+            <!-- Cache lookup last. The response cache page says a hit returns
+                 without forwarding to the backend, and does not say whether
+                 the rest of the request flow runs. Placing the lookup after
+                 every control means the answer cannot change what is
+                 enforced. See apigee/semantics.py UNANSWERED. -->
+            <Step>
+                <Name>RC-Completions</Name>
+            </Step>
+        </Request>
+        <Response>
+            <Step>
+                <Name>RC-Completions</Name>
+            </Step>
+        </Response>
+    </PreFlow>
+    <Flows>
+        <Flow name="chat-completions">
+            <Description>Routing only. Controls are in the PreFlow.</Description>
+            <Condition>(proxy.pathsuffix MatchesPath "/chat/completions") and (request.verb = "POST")</Condition>
+            <Request/>
+            <Response/>
+        </Flow>
+        <Flow name="embeddings">
+            <Description>Routing only. Controls are in the PreFlow.</Description>
+            <Condition>(proxy.pathsuffix MatchesPath "/embeddings") and (request.verb = "POST")</Condition>
+            <Request/>
+            <Response/>
+        </Flow>
+    </Flows>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <HTTPProxyConnection>
+        <BasePath>/v1</BasePath>
+    </HTTPProxyConnection>
+    <RouteRule name="default">
+        <TargetEndpoint>default</TargetEndpoint>
+    </RouteRule>
+</ProxyEndpoint>

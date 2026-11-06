@@ -1,0 +1,24 @@
+<!--
+  UseEffectiveCount is set because without it the rate is per message
+  processor. The spike arrest page says each message processor handles its own
+  throttling independently, and tells you to multiply by the number of
+  processors to get the aggregate. A Rate of 60ps with this element absent is
+  therefore 60 times the processor count, which is not a number anybody wrote
+  down.
+
+  Rate is also a smoother and not a counter. The page's own worked example is
+  10ps giving one request every 100 milliseconds. So 60ps refuses a client's
+  second request if it arrives inside about 17 milliseconds of the first, even
+  when that client has sent two requests all second. That is the intended
+  behaviour for a spike and it is not a quota. Q-TenantBudget is the quota.
+-->
+<SpikeArrest async="false" continueOnError="false" enabled="true" name="SA-PerClient">
+    <DisplayName>Arrest per client</DisplayName>
+    <Rate>60ps</Rate>
+    <!-- Without an Identifier one rate limit covers every caller, so one
+         noisy tenant arrests everybody. The key is the verified subject
+         rather than an API key, because arrest runs before verification and
+         a header is caller supplied either way. -->
+    <Identifier ref="request.header.x-tenant-id"/>
+    <UseEffectiveCount>true</UseEffectiveCount>
+</SpikeArrest>

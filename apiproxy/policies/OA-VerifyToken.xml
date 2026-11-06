@@ -1,0 +1,13 @@
+<!--
+  Verifies the access token. The page says VerifyAccessToken verifies that the
+  token is valid and that a valid token is allowed to proceed. It does NOT say
+  the operation enforces the API product's resource paths, so nothing here
+  relies on it for path authorisation. That question is in
+  apigee/semantics.py UNANSWERED and the product definition carries explicit
+  paths instead of a wildcard.
+-->
+<OAuthV2 async="false" continueOnError="false" enabled="true" name="OA-VerifyToken">
+    <DisplayName>Verify access token</DisplayName>
+    <Operation>VerifyAccessToken</Operation>
+    <GenerateResponse enabled="true"/>
+</OAuthV2>

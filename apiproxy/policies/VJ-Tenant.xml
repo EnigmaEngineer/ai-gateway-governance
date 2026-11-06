@@ -1,0 +1,42 @@
+<!--
+  Issuer and Audience are both Presence Optional on the policy's own page, so
+  a VerifyJWT without them verifies a signature and nothing about who issued
+  the token or who it was for. Any token signed by the right key passes. Both
+  are set here for that reason.
+
+  What cannot be set here is a requirement that the token expire. The page
+  defines the policy's valid variable as the signature verifying and the time
+  being inside expiry and notBefore IF THEY ARE PRESENT, and AdditionalClaims
+  refuses registered claim names, which includes exp. So a token with no exp
+  claim is valid and this policy has no element that refuses it. RF-NoExpiry
+  in the proxy PreFlow is the refusal.
+
+  TODO: the flow variable name for a decoded claim is the one piece of this
+  bundle not read off a vendor page. The condition in proxies/default.xml and
+  the Identifier in Q-TenantBudget both use jwt.VJ-Tenant.decoded.claim.exp
+  and .sub, which follows the jwt.POLICYNAME. prefix the page uses for valid.
+  Confirm both against a deployed proxy before trusting them, because a
+  condition on an unresolved variable is a condition that is false, and a
+  false condition on RF-NoExpiry means a token with no expiry is admitted.
+  That is the one way this bundle can fail quietly.
+-->
+<VerifyJWT async="false" continueOnError="false" enabled="true" name="VJ-Tenant">
+    <DisplayName>Verify tenant token</DisplayName>
+    <Algorithm>RS256</Algorithm>
+    <!-- The default source is request.header.authorization. Named anyway, so
+         a reader does not have to know the default to know where to look. -->
+    <Source>request.header.authorization</Source>
+    <PublicKey>
+        <!-- The uri is static. The page says it cannot be set from a
+             variable, so an environment cannot vary it and the value is part
+             of the bundle rather than part of a deployment. -->
+        <JWKS uri="https://tenants.invalid/.well-known/jwks.json"/>
+    </PublicKey>
+    <Issuer>https://tenants.invalid/</Issuer>
+    <Audience>ai-gateway</Audience>
+    <!-- Default is false for all three. Set explicitly because each one
+         decides whether a malformed token is an error or a pass. -->
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <IgnoreIssuedAt>false</IgnoreIssuedAt>
+    <IgnoreCriticalHeaders>false</IgnoreCriticalHeaders>
+</VerifyJWT>

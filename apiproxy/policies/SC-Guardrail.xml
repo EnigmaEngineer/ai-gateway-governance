@@ -1,0 +1,22 @@
+<!--
+  Calls the guardrail service built on days 1 to 3. It redacts the Safe Harbour
+  classes gateway/policy.py enumerates and scores prompt injection by attack
+  class.
+
+  TODO: the URL is the internal load balancer from terraform and no cluster
+  exists, so this address resolves nowhere. A deployment fails here rather than
+  forwarding unguarded traffic, which is the failure worth having.
+-->
+<ServiceCallout async="false" continueOnError="false" enabled="true" name="SC-Guardrail">
+    <DisplayName>Call the guardrail</DisplayName>
+    <Request variable="guardrailRequest">
+        <Set>
+            <Verb>POST</Verb>
+            <Path>/v1/guard</Path>
+        </Set>
+    </Request>
+    <Response>guardrailResponse</Response>
+    <HTTPTargetConnection>
+        <URL>https://gateway.internal.invalid</URL>
+    </HTTPTargetConnection>
+</ServiceCallout>

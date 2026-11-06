@@ -1,0 +1,24 @@
+<!--
+  The target is the guardrail service, which forwards to the model provider on
+  its own upstream. The Helm chart puts the detector in front of the proxy for
+  the same reason: a caller must not be able to reach the provider without
+  passing the thing that redacts.
+
+  TODO: the URL is the internal load balancer address from terraform/outputs.tf
+  and no cluster exists to read it from. It is a placeholder and a deployment
+  would fail on it, which is the intended failure.
+-->
+<TargetEndpoint name="default">
+    <PreFlow name="PreFlow">
+        <Request/>
+        <Response/>
+    </PreFlow>
+    <Flows/>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <HTTPTargetConnection>
+        <URL>https://gateway.internal.invalid/v1</URL>
+    </HTTPTargetConnection>
+</TargetEndpoint>

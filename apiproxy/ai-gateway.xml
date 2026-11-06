@@ -1,0 +1,5 @@
+<APIProxy revision="1" name="ai-gateway">
+    <DisplayName>ai-gateway</DisplayName>
+    <Description>Governed front door for LLM traffic. Controls live in the PreFlow.</Description>
+    <BasePaths>/v1</BasePaths>
+</APIProxy>

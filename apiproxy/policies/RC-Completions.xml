@@ -1,0 +1,33 @@
+<!--
+  Two defaults on this policy decide whether a cache is a cache or a leak.
+
+  ExcludeErrorResponse defaults to false, and the page says the policy then
+  caches responses with any possible status code. A provider's 503 cached for
+  the expiry window turns a blip into an outage that outlives it. Set true,
+  which the page says limits caching to 200 through 205.
+
+  The cache key is whatever you put in it. The page's key example is the
+  request URI and it names no caller identity. Two tenants posting the same
+  prompt share a key, so one reads the other's completion, which for this
+  gateway means reading text the redactor was pointed at. The subject and the
+  audience are both in the key for that reason.
+
+  There is no Prefix. The page says a Prefix supersedes the Scope value, so
+  adding one silently turns off the Exclusive scope below. Scope is named
+  explicitly even though Exclusive is the default, because the whole point is
+  that it is doing work.
+-->
+<ResponseCache async="false" continueOnError="false" enabled="true" name="RC-Completions">
+    <DisplayName>Cache completions per tenant</DisplayName>
+    <CacheKey>
+        <KeyFragment ref="jwt.VJ-Tenant.decoded.claim.sub"/>
+        <KeyFragment ref="jwt.VJ-Tenant.decoded.claim.aud"/>
+        <KeyFragment ref="request.uri"/>
+        <KeyFragment ref="messageid"/>
+    </CacheKey>
+    <Scope>Exclusive</Scope>
+    <ExpirySettings>
+        <TimeoutInSeconds>300</TimeoutInSeconds>
+    </ExpirySettings>
+    <ExcludeErrorResponse>true</ExcludeErrorResponse>
+</ResponseCache>
