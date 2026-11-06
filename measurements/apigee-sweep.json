@@ -1,0 +1,221 @@
+{
+  "arms": [
+    {
+      "expects": "quota-not-distributed",
+      "findings": [
+        "quota-not-distributed"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "quota counts per message processor",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "quota-not-synchronous",
+      "findings": [
+        "quota-not-synchronous"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "quota counter is asynchronous",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "quota-has-no-identifier",
+      "findings": [
+        "quota-has-no-identifier"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "quota is one counter for every tenant",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "spikearrest-not-distributed",
+      "findings": [
+        "spikearrest-not-distributed"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "arrest is per message processor",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "spikearrest-has-no-identifier",
+      "findings": [
+        "spikearrest-has-no-identifier"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "arrest is one limit for every tenant",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "jwt-no-issuer",
+      "findings": [
+        "jwt-no-issuer"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "any issuer is accepted",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "jwt-no-audience",
+      "findings": [
+        "jwt-no-audience"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "any audience is accepted",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "jwt-registered-claim-in-additionalclaims",
+      "findings": [
+        "jwt-registered-claim-in-additionalclaims"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "exp required through AdditionalClaims",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "nothing-refuses-a-token-with-no-expiry",
+      "findings": [
+        "control-not-in-preflow",
+        "nothing-refuses-a-token-with-no-expiry"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "nothing refuses a token with no expiry",
+      "only_the_expected_rule": false
+    },
+    {
+      "expects": "cache-stores-error-responses",
+      "findings": [
+        "cache-stores-error-responses"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "error responses are cached",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "cache-key-has-no-caller-identity",
+      "findings": [
+        "cache-key-has-no-caller-identity"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "cache is shared across tenants",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "cache-prefix-overrides-scope",
+      "findings": [
+        "cache-prefix-overrides-scope"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "a prefix turns off the cache scope",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "control-in-conditional-flow",
+      "findings": [
+        "control-in-conditional-flow",
+        "control-not-in-preflow"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the guardrail moved to a conditional flow",
+      "only_the_expected_rule": false
+    },
+    {
+      "expects": "unreachable-conditional-flow",
+      "findings": [
+        "unreachable-conditional-flow"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "a second flow repeats a condition",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "product-names-no-proxies",
+      "findings": [
+        "product-names-no-proxies"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "a product names no proxies",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "product-wildcard-beats-its-siblings",
+      "findings": [
+        "product-wildcard-beats-its-siblings"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "a product carries a wildcard path",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "cache-has-no-key",
+      "findings": [
+        "cache-has-no-key"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the cache has no key at all",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "product-names-no-paths",
+      "findings": [
+        "product-names-no-paths"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "a product names no resource paths",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "control-not-in-preflow",
+      "findings": [
+        "control-not-in-preflow"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the quota policy is left out of the PreFlow",
+      "only_the_expected_rule": true
+    }
+  ],
+  "arms_gradeable": 19,
+  "arms_total": 19,
+  "arms_tripping_only_their_own_rule": 17,
+  "baseline_exit": 0,
+  "baseline_findings": [],
+  "control_finding_codes": [
+    "cache-key-has-no-caller-identity",
+    "cache-stores-error-responses",
+    "control-not-in-preflow",
+    "jwt-no-audience",
+    "jwt-no-issuer",
+    "nothing-refuses-a-token-with-no-expiry",
+    "product-names-no-proxies",
+    "quota-has-no-identifier",
+    "quota-not-distributed",
+    "quota-not-synchronous",
+    "spikearrest-has-no-identifier",
+    "spikearrest-not-distributed"
+  ],
+  "control_finding_count": 14,
+  "rules_dead": [],
+  "rules_exercised": 19,
+  "rules_firing_on_the_untouched_bundle": [],
+  "rules_in_the_checker": 19,
+  "rules_no_arm_exercises": []
+}

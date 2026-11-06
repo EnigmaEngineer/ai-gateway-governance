@@ -1,0 +1,20 @@
+{
+  "defaults_are_edge_sourced": true,
+  "finding_count": 0,
+  "findings": [],
+  "graded": {
+    "conditional_flows": 2,
+    "conditioned_preflow_steps": 1,
+    "enforcing_policies": 6,
+    "policies": 7,
+    "preflow_request_steps": 7,
+    "products": 2
+  },
+  "rules": [],
+  "sourced_facts": 23,
+  "unanswered_questions": [
+    "flow.no_conditional_matches",
+    "oauthv2.verifyaccesstoken_checks_product_paths",
+    "responsecache.hit_skips_rest_of_request_flow"
+  ]
+}
