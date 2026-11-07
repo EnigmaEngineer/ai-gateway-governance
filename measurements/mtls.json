@@ -1,0 +1,114 @@
+{
+ "arms": [
+  {
+   "arm": "hardened backend, the gateway's own certificate",
+   "as_expected": true,
+   "caller": "ai-gateway",
+   "exchange": "answered",
+   "expected": "answered",
+   "failure": null,
+   "handshake": "completed",
+   "negotiated": "TLSv1.3",
+   "server_hostname_sent": "localhost",
+   "status": 200
+  },
+  {
+   "arm": "hardened backend, no client certificate",
+   "as_expected": true,
+   "caller": null,
+   "exchange": "refused",
+   "expected": "refused",
+   "failure": "SSLError",
+   "handshake": "completed",
+   "negotiated": "TLSv1.3",
+   "server_hostname_sent": "localhost",
+   "status": null
+  },
+  {
+   "arm": "hardened backend, a valid certificate from an unrelated CA",
+   "as_expected": true,
+   "caller": null,
+   "exchange": "refused",
+   "expected": "refused",
+   "failure": "SSLError",
+   "handshake": "completed",
+   "negotiated": "TLSv1.3",
+   "server_hostname_sent": "localhost",
+   "status": null
+  },
+  {
+   "arm": "hardened backend, client does not trust the backend's CA",
+   "as_expected": true,
+   "caller": null,
+   "exchange": "refused",
+   "expected": "refused",
+   "failure": "SSLCertVerificationError",
+   "handshake": "refused",
+   "server_hostname_sent": "localhost",
+   "status": null
+  },
+  {
+   "arm": "hardened backend, a name the backend certificate does not carry",
+   "as_expected": true,
+   "caller": null,
+   "exchange": "refused",
+   "expected": "refused",
+   "failure": "SSLCertVerificationError",
+   "handshake": "refused",
+   "server_hostname_sent": "backend.invalid",
+   "status": null
+  },
+  {
+   "arm": "hardened backend, the same wrong name with the check turned off",
+   "as_expected": true,
+   "caller": "ai-gateway",
+   "exchange": "answered",
+   "expected": "answered",
+   "failure": null,
+   "handshake": "completed",
+   "negotiated": "TLSv1.3",
+   "server_hostname_sent": "backend.invalid",
+   "status": 200
+  },
+  {
+   "arm": "default server context, no client certificate",
+   "as_expected": true,
+   "caller": null,
+   "exchange": "answered",
+   "expected": "answered",
+   "failure": null,
+   "handshake": "completed",
+   "negotiated": "TLSv1.3",
+   "server_hostname_sent": "localhost",
+   "status": 200
+  }
+ ],
+ "arms_answered": 3,
+ "arms_as_expected": 7,
+ "arms_refused": 4,
+ "arms_total": 7,
+ "callers_the_backend_recorded": {
+  "ai-gateway": 2,
+  "no client certificate": 1
+ },
+ "client_context": {
+  "check_hostname": true,
+  "minimum_version": "TLSv1_2",
+  "verify_mode": "CERT_REQUIRED"
+ },
+ "default_server_context": {
+  "check_hostname": false,
+  "minimum_version": "TLSv1_2",
+  "verify_mode": "CERT_NONE"
+ },
+ "handshake_completed_but_exchange_refused": [
+  "hardened backend, a valid certificate from an unrelated CA",
+  "hardened backend, no client certificate"
+ ],
+ "hardened_server_context": {
+  "check_hostname": false,
+  "minimum_version": "TLSv1_2",
+  "verify_mode": "CERT_REQUIRED"
+ },
+ "note": "Every refusal is reported beside a control that got through for the mirrored reason. The two no certificate arms differ only in the server's verify_mode, and the two wrong name arms differ only in the client's check_hostname."
+}

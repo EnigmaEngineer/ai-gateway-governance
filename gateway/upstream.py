@@ -21,9 +21,9 @@ the reconciliation path should not have to be rewritten to meet a real one.
 import argparse
 import json
 import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 
-from . import tokens
+from . import mtls, tokens
 
 MAX_BODY = 1 << 20
 
@@ -41,10 +41,27 @@ _FILLER = ("the", "record", "shows", "a", "visit", "with", "no", "further",
 # because a run that quietly took the shortcut measures a different service.
 _served_lock = threading.Lock()
 _served = 0
+# Which client identities have been through. A backend behind mutual TLS that
+# does not record who called is throwing away the only thing the certificate
+# bought it.
+_callers = {}
 
 
 def served():
     return _served
+
+
+def callers():
+    with _served_lock:
+        return dict(_callers)
+
+
+def reset_counters():
+    """So one process can run several arms without carrying counts across."""
+    global _served
+    with _served_lock:
+        _served = 0
+        _callers.clear()
 
 
 def complete(prompt, output_ceiling):
@@ -94,13 +111,22 @@ class Handler(BaseHTTPRequestHandler):
             self._json(400, {"error": "body must carry prompt and max_output_tokens"})
             return
         global _served
+        caller = mtls.peer_name(self.connection) if self.tls else None
         with _served_lock:
             _served += 1
-        self._json(200, complete(prompt, ceiling))
+            key = caller or "no client certificate"
+            _callers[key] = _callers.get(key, 0) + 1
+        answer = complete(prompt, ceiling)
+        answer["caller"] = caller
+        self._json(200, answer)
+
+    @property
+    def tls(self):
+        return hasattr(self.connection, "getpeercert")
 
     def do_GET(self):
         if self.path == "/counters":
-            self._json(200, {"served": served()})
+            self._json(200, {"served": served(), "callers": callers()})
         else:
             self._json(404, {"error": "no such path"})
 
@@ -116,12 +142,36 @@ class Handler(BaseHTTPRequestHandler):
         return
 
 
+def serve(host, port, context=None, threaded=False):
+    """Bring up the backend, over mutual TLS when a context is handed in.
+
+    The listening socket is wrapped rather than each connection, so a client
+    that fails the handshake never reaches the handler at all. That is the
+    behaviour worth having and it is also why a refused client shows up here
+    as nothing rather than as a 403.
+    """
+    cls = ThreadingHTTPServer if threaded else HTTPServer
+    server = cls((host, port), Handler)
+    if context is not None:
+        server.socket = context.wrap_socket(server.socket, server_side=True)
+    return server
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--port", type=int, default=8081)
     ap.add_argument("--host", default="127.0.0.1")
+    ap.add_argument("--tls-ca", help="CA that client certificates must chain to")
+    ap.add_argument("--tls-cert", help="this backend's certificate")
+    ap.add_argument("--tls-key", help="this backend's private key")
     args = ap.parse_args()
-    HTTPServer((args.host, args.port), Handler).serve_forever()
+    context = None
+    if args.tls_cert:
+        if not args.tls_ca:
+            raise SystemExit("serving TLS without --tls-ca accepts any client, "
+                             "which is one way TLS wearing the word mutual")
+        context = mtls.server_context(args.tls_ca, args.tls_cert, args.tls_key)
+    serve(args.host, args.port, context=context).serve_forever()
 
 
 if __name__ == "__main__":
