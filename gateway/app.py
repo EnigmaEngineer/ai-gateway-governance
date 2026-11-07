@@ -26,12 +26,10 @@ because the difference is easy to assume away.
 
 import argparse
 import json
-import urllib.error
-import urllib.request
 from dataclasses import asdict
 from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 
-from . import upstream
+from . import failover, mtls, upstream, versioning
 from .guardrail import apply
 from .policy import DECLARED_OMISSIONS, ENFORCED, SAFE_HARBOR
 from .quota import (Admission, CounterStore, Overloaded, QuotaExceeded,
@@ -40,9 +38,16 @@ from .stream import StreamRedactor
 
 MAX_BODY = 1 << 20
 
-# What a caller gets if it does not declare one. A ceiling is part of the
+# What a v1 caller gets if it does not declare one. A ceiling is part of the
 # reservation, so a request without one cannot be admitted on an estimate at
-# all, and refusing those would make the quota opt in.
+# all, and refusing those would have made the quota opt in on the day it
+# shipped.
+#
+# This is the reason there are two versions. A caller that declares nothing
+# gets a budget decision it never chose, which is the same defect as an
+# omission from an allow list being a grant. v2 refuses the request instead
+# and names the field. v1 keeps the default for the callers already built
+# against it, and says in every response that it is going away.
 DEFAULT_OUTPUT_CEILING = 256
 
 # Defaults for the streaming path, measured on 2026-11-03. The holdback reaches
@@ -69,9 +74,24 @@ class Settings:
     """
 
     def __init__(self, budget=0, admission_limit=0, upstream=None,
-                 serialise=True, store_round_trip=0.0, reserve_fraction=1.0):
+                 serialise=True, store_round_trip=0.0, reserve_fraction=1.0,
+                 upstream_context=None, attempt_timeout=30.0,
+                 breaker_threshold=0, breaker_cooldown=30.0):
         self.budget = budget
         self.upstream = upstream
+        self.upstream_context = upstream_context
+        # One provider or several, the same pool. A single upstream taking a
+        # different code path would mean the failover arithmetic is only ever
+        # exercised by the sweep.
+        self.pool = None
+        if upstream:
+            urls = [upstream] if isinstance(upstream, str) else list(upstream)
+            self.pool = failover.Pool(
+                [failover.Provider("provider-%d" % i, url, context=upstream_context)
+                 for i, url in enumerate(urls, 1)],
+                attempt_timeout=attempt_timeout,
+                breaker_threshold=breaker_threshold,
+                breaker_cooldown=breaker_cooldown)
         self.serialise = serialise
         self.store_round_trip = store_round_trip
         self.reserve_fraction = reserve_fraction
@@ -108,6 +128,8 @@ class Settings:
                 "headroom_returned_tokens": b.headroom_returned_tokens,
             }
         out["blocked"] = self.blocked
+        if self.pool is not None:
+            out["providers"] = self.pool.counters()
         if self.admission is not None:
             out["admission"] = {
                 "limit": self.admission.limit,
@@ -128,25 +150,62 @@ class Handler(BaseHTTPRequestHandler):
     # gift to anyone fingerprinting the service.
     sys_version = ""
 
+    # Which version this request came in on, set by the router before anything
+    # else looks at the path. None means the path carried no version this
+    # gateway serves, and the only thing that can happen next is a refusal.
+    api_version = None
+
+    def _version_headers(self):
+        if self.api_version is None:
+            return []
+        return self.api_version.headers()
+
     def _json(self, status, payload):
         body = json.dumps(payload, sort_keys=True).encode("utf-8")
         self.send_response(status)
         self.send_header("content-type", "application/json")
         self.send_header("content-length", str(len(body)))
+        for name, value in self._version_headers():
+            self.send_header(name, value)
         self.end_headers()
         self.wfile.write(body)
 
+    def _route(self):
+        """Pull the version off the path, or refuse.
+
+        A caller that names a version this gateway does not serve is told so
+        rather than being handed whatever is current. Guessing is how a client
+        written against v1 silently starts getting v2 behaviour on the day v2
+        ships, which is the thing the deprecation window exists to prevent.
+        """
+        self.api_version = None
+        if self.path in versioning.UNVERSIONED:
+            return self.path
+        name, rest = versioning.split(self.path)
+        if name is None:
+            self._json(404, {
+                "error": "name a version this gateway serves",
+                "versions": sorted(versioning.VERSIONS),
+                "current": versioning.CURRENT,
+            })
+            return None
+        self.api_version = versioning.VERSIONS[name]
+        return rest
+
     def do_GET(self):
-        if self.path == "/v1/policy":
+        path = self._route()
+        if path is None:
+            return
+        if path == "/policy":
             self._json(200, {
                 "enumeration": "45 CFR 164.514(b)(2)",
                 "enumerated": list(SAFE_HARBOR),
                 "enforced": sorted(ENFORCED),
                 "declared_omissions": DECLARED_OMISSIONS,
             })
-        elif self.path == "/v1/counters":
+        elif path == "/counters":
             self._json(200, SETTINGS.counters())
-        elif self.path == "/healthz":
+        elif path == "/healthz":
             self._json(200, {"ok": True})
         else:
             self._json(404, {"error": "no such path"})
@@ -165,13 +224,16 @@ class Handler(BaseHTTPRequestHandler):
             return None
 
     def do_POST(self):
-        if self.path == "/v1/guard/stream":
+        path = self._route()
+        if path is None:
+            return
+        if path == "/guard/stream":
             self._stream()
             return
-        if self.path == "/v1/chat":
+        if path == "/chat":
             self._chat()
             return
-        if self.path != "/v1/guard":
+        if path != "/guard":
             self._json(404, {"error": "no such path"})
             return
         read = self._read_text()
@@ -203,6 +265,8 @@ class Handler(BaseHTTPRequestHandler):
         # deciding about.
         self.send_header("x-guardrail-holdback-chars", str(STREAM_HOLDBACK))
         self.send_header("x-guardrail-injection-assessed", "false")
+        for name, value in self._version_headers():
+            self.send_header(name, value)
         self.end_headers()
         for i in range(0, len(text), UPSTREAM_CHUNK):
             self._chunk(redactor.feed(text[i:i + UPSTREAM_CHUNK]))
@@ -230,6 +294,13 @@ class Handler(BaseHTTPRequestHandler):
         # apart. A caller that declares nought is saying something wrong and
         # gets told so, rather than quietly receiving the default.
         declared = payload.get("max_output_tokens")
+        if declared is None and self.api_version.name != "v1":
+            self._json(400, {
+                "error": "declare max_output_tokens, the quota reserves against it",
+                "v1_behaviour": "a request without one was charged against a "
+                                "default of %d tokens" % DEFAULT_OUTPUT_CEILING,
+            })
+            return
         try:
             ceiling = DEFAULT_OUTPUT_CEILING if declared is None else int(declared)
         except (TypeError, ValueError):
@@ -304,20 +375,21 @@ class Handler(BaseHTTPRequestHandler):
         suite runs against. The socket path is what the load test uses, because
         a quota measured without the serialisation a real request goes through
         is measuring something easier than the service.
+
+        The pool is the same object whether one provider is configured or
+        three, so the ordinary path and the failover path are one path.
         """
-        if not SETTINGS.upstream:
+        if SETTINGS.pool is None:
             return upstream.complete(text, ceiling)
-        request = urllib.request.Request(
-            SETTINGS.upstream,
-            data=json.dumps({"prompt": text, "max_output_tokens": ceiling}).encode("utf-8"),
-            headers={"content-type": "application/json"},
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=30) as response:
-                return json.loads(response.read())
-        except (urllib.error.URLError, OSError, ValueError) as exc:
-            self._json(502, {"error": "upstream did not answer: %s" % exc})
+        answer, trace = SETTINGS.pool.send(text, ceiling)
+        if answer is None:
+            self._json(502, {
+                "error": "no provider answered",
+                "tried": [{"provider": name, "outcome": outcome}
+                          for name, outcome in trace],
+            })
             return None
+        return answer
 
     def _chunk(self, piece):
         if not piece:
@@ -340,8 +412,22 @@ def main():
                     help="token budget per tenant for the window, 0 leaves the quota off")
     ap.add_argument("--admission-limit", type=int, default=0,
                     help="requests allowed in detection at once, 0 leaves it unbounded")
-    ap.add_argument("--upstream", default=None,
-                    help="url of the completion endpoint, in process when absent")
+    ap.add_argument("--upstream", action="append", default=None,
+                    help="url of a completion endpoint, in process when absent. "
+                         "Repeat it for failover, in the order to try")
+    ap.add_argument("--attempt-timeout", type=float, default=30.0,
+                    help="seconds one provider gets before the next is tried")
+    ap.add_argument("--breaker-threshold", type=int, default=0,
+                    help="consecutive failures that stop a provider being "
+                         "asked, 0 leaves the breaker off")
+    ap.add_argument("--breaker-cooldown", type=float, default=30.0,
+                    help="seconds an open breaker waits before one request "
+                         "is let through to decide")
+    ap.add_argument("--upstream-ca",
+                    help="CA the backend certificate must chain to")
+    ap.add_argument("--upstream-cert",
+                    help="this gateway's client certificate, for mutual TLS")
+    ap.add_argument("--upstream-key", help="key for the client certificate")
     ap.add_argument("--no-serialise", action="store_true",
                     help="read and write the counter without a critical section")
     ap.add_argument("--store-round-trip", type=float, default=0.0,
@@ -352,11 +438,23 @@ def main():
                     help="one thread per request, which is what the load test needs")
     args = ap.parse_args()
 
+    context = None
+    if args.upstream_cert:
+        if not args.upstream_ca:
+            raise SystemExit("--upstream-cert without --upstream-ca would send "
+                             "this gateway's identity to whoever answered")
+        context = mtls.client_context(args.upstream_ca, args.upstream_cert,
+                                      args.upstream_key)
+
     global SETTINGS
     SETTINGS = Settings(budget=args.budget, admission_limit=args.admission_limit,
                         upstream=args.upstream, serialise=not args.no_serialise,
                         store_round_trip=args.store_round_trip,
-                        reserve_fraction=args.reserve_fraction)
+                        reserve_fraction=args.reserve_fraction,
+                        upstream_context=context,
+                        attempt_timeout=args.attempt_timeout,
+                        breaker_threshold=args.breaker_threshold,
+                        breaker_cooldown=args.breaker_cooldown)
     server = ThreadingHTTPServer if args.threaded else HTTPServer
     server((args.host, args.port), Handler).serve_forever()
 
