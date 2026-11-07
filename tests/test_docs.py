@@ -80,3 +80,59 @@ def test_the_scoring_document_names_both_seeds(root):
     text = doc(root, "scoring.md")
     for seed in ("11", "23"):
         assert "seed %s" % seed in text.lower()
+
+
+def test_the_mtls_document_table_matches_the_probe(root, manifests):
+    """Seven arms and a verdict each. A table typed by hand goes stale."""
+    text = doc(root, "mtls.md")
+    arms = manifests["mtls"]["arms"]
+    assert len(arms) >= 6, "only %d arms, so the table is shorter than it was" % len(arms)
+    for a in arms:
+        row = "| %s | %s | %s |" % (a["arm"], a["handshake"], a["exchange"])
+        assert row in text, "the table is missing or wrong for %r" % a["arm"]
+
+
+def test_the_mtls_document_counts_the_late_refusals(root, manifests):
+    late = manifests["mtls"]["handshake_completed_but_exchange_refused"]
+    text = doc(root, "mtls.md")
+    assert "Two of the seven" in text and len(late) == 2, (
+        "the document says two and the probe found %d" % len(late))
+
+
+def test_the_failover_document_names_the_widths_that_were_swept(root, manifests):
+    text = doc(root, "failover.md")
+    for width in manifests["failover"]["widths_swept"]:
+        assert str(width) in text, "%s was swept and the document omits it" % width
+
+
+def test_the_failover_document_arm_count_is_the_measured_one(root, manifests):
+    """Thirty two plus one, and the plus one is the arm that loses requests."""
+    m = manifests["failover"]
+    text = doc(root, "failover.md").lower()
+    assert "sixteen arms" in text, "the document no longer states the arm count"
+    assert len(m["arms"]) == 16, "the sweep has %d arms now" % len(m["arms"])
+    assert m["both_providers_down"]["requests_lost"] == m["requests_per_arm"]
+    assert "forty requests per arm" in text and m["requests_per_arm"] == 40
+
+
+def test_the_failover_document_breaker_threshold_is_the_measured_one(root, manifests):
+    m = manifests["failover"]
+    assert m["breaker_threshold"] == 3
+    assert "three consecutive failures" in doc(root, "failover.md")
+
+
+def test_the_versioning_document_carries_the_header_the_gateway_sends(root):
+    """The example in the document is the string the registry produces."""
+    from gateway import versioning
+    text = doc(root, "versioning.md")
+    headers = dict(versioning.VERSIONS["v1"].headers())
+    assert headers["deprecation"] in text
+    assert headers["sunset"] in text
+
+
+def test_the_versioning_document_names_the_wrong_zone_token(root):
+    """The authoritative example writes UTC and the grammar wants GMT."""
+    from gateway import versioning
+    text = doc(root, "versioning.md")
+    assert versioning.RFC9745_SECTION_4_EXAMPLE_SUNSET in text
+    assert "rel=\"deprecation\"" in text

@@ -290,7 +290,7 @@ verifies a signature and nothing about who signed it. A `ResponseCache` with
 no caller in its key serves one tenant's completion to another. All three
 deploy and `terraform validate` cannot see any of them.
 
-So `apigee/semantics.py` carries 23 documented defaults, each with the sentence
+So `apigee/semantics.py` carries 25 documented defaults, each with the sentence
 it came from and its URL, and `scripts/policy_check.py` refuses to write a rule
 on a default that is not in there. `scripts/bundle_sweep.py` then breaks the
 bundle 19 ways, one per rule, and fails if any rule does not fire or if any
@@ -302,6 +302,64 @@ present, and the element that could require a claim refuses registered names,
 `exp` among them. So the policy admits a token that never expires and has no
 setting that refuses it. `RF-NoExpiry` is a separate step for that reason.
 
-The argument is in `docs/apigee.md` with the 23 sourced quotes. It also carries
+The argument is in `docs/apigee.md` with the 25 sourced quotes. It also carries
 the three questions the vendor's pages did not answer and why these are Edge
 pages rather than X pages.
+
+## The hop to the backend, and the two headers that retire a version
+
+Three things landed together because they are all the same hop. The gateway
+presents a client certificate to the backend, the backend refuses anything
+else, and the version a caller asked for decides what it gets.
+
+### Mutual TLS, and the default that is not mutual
+
+`ssl.create_default_context(Purpose.CLIENT_AUTH)` is the call you build a
+server with and it leaves `verify_mode` at `CERT_NONE`. The same call for a
+client gives `CERT_REQUIRED`. So a backend built the obvious way serves real
+TLS, presents a real certificate, and accepts a caller presenting nothing.
+Every tool that reports a cipher says it is fine.
+
+`measurements/mtls.json` runs seven arms and two of them completed the TLS
+handshake and were refused afterwards. Both are cases where the server rejects
+the client, and under TLS 1.3 that verdict arrives after `wrap_socket` has
+already returned. A probe reading the handshake alone reports a refusal as a
+success. The two arms that do fail at the handshake are the two where the
+client rejects the server.
+
+Every refusal in that table sits beside a control that got through for the
+mirrored reason. The two no certificate arms differ only in the server's
+`verify_mode`. The two wrong name arms differ only in the client's
+`check_hostname`. `docs/mtls.md` has the table and what it does not cover.
+
+### Failover, measured across the constant that decides it
+
+A failover time is not one number. Against a primary whose listener is gone it
+is about seven tenths of a millisecond on this machine and the attempt timeout
+never appears in it. Against a primary still accepting connections and no
+longer answering, the median is the timeout to within about two milliseconds,
+at every one of four widths swept. A breaker at three consecutive failures
+drops that back under a millisecond by asking the dead provider three times
+instead of forty.
+
+Counts are in `measurements/failover.json`, sixteen arms plus one with both
+providers down so that `requests_lost` is a column the sweep produced rather
+than a zero. The wall times are in `docs/failover.md` rather than the manifest,
+because a count re-derives on another machine and a millisecond does not.
+
+### Versioning
+
+`v1` charges a chat request that declares no `max_output_tokens` against a
+default of 256. `v2` refuses it and names the field, which is a breaking change
+and the reason there is a deprecation window rather than a changelog entry.
+
+The registry in `gateway/versioning.py` is an allow list, so `/v3/chat` and an
+unversioned `/chat` are both refused with the list of versions that exist. A
+prefix rule would have routed either one to whatever is current.
+
+`Deprecation` and `Sunset` travel together and do not share a format. One is a
+Structured Fields date, `@1790812800`. The other is an HTTP-date ending in the
+literal `GMT`. RFC 9745's own worked example of the pair writes that zone as
+`UTC`, which the HTTP-date grammar refuses, so copying the authority produces a
+broken field. `docs/versioning.md` has the four one-line spellings and which
+two of them are wrong.
