@@ -204,6 +204,27 @@ FACTS = [
         EDGE_PRODUCTS,
         "The typo is the page's. Quoted as printed so the sentence can be found.",
     ),
+    Fact(
+        "verifyjwt.decoded_claim_variable",
+        "jwt.{policy_name}.decoded.claim.{name}",
+        "if the policy name is `jwt-parse-token` , then the policy will store the "
+        "subject specified in the JWT to the context variable named "
+        "`jwt.jwt-parse-token.decoded.claim.sub`",
+        EDGE_DOCS + "verify-jwt-policy",
+        "Singular claim, and the last segment is the raw JWT claim name. The "
+        "page's other example is decoded.claim.iat. This was a pattern match on "
+        "the jwt.POLICYNAME prefix for one day before anybody read it.",
+    ),
+    Fact(
+        "verifyjwt.legacy_claim_variable_renames_registered_claims",
+        "jwt.{policy_name}.claim.expiry",
+        "The expiration date/time, expressed in milliseconds since epoch.",
+        EDGE_DOCS + "verify-jwt-policy",
+        "The older claim family is not a shorter alias. It renames the "
+        "registered claims, so the legacy spelling of exp is claim.expiry and "
+        "of sub is claim.subject. Its times are milliseconds where the decoded "
+        "family is seconds, so swapping the names moves a figure by a thousand.",
+    ),
 ]
 
 BY_KEY = {f.key: f for f in FACTS}

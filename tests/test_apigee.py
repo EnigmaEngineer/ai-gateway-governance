@@ -216,6 +216,46 @@ def test_the_published_sweep_numbers_match_the_manifest():
 
 
 
+def without_comments(text):
+    """The configuration with every XML comment removed."""
+    return re.sub(r"<!--.*?-->", "", text, flags=re.S)
+
+
+def test_every_claim_reference_uses_the_documented_variable_family():
+    """The legacy family is not a shorter alias and it renames exp and sub.
+
+    A reference to jwt.VJ-Tenant.claim.exp would resolve to nothing, which
+    makes the RF-NoExpiry condition false and admits a token with no expiry.
+    The one in the bundle is the documented spelling and this is what keeps a
+    later tidy up from shortening it.
+    """
+    pattern = semantics.fact("verifyjwt.decoded_claim_variable").value
+    assert pattern == "jwt.{policy_name}.decoded.claim.{name}"
+    refs = []
+    for path in sorted((ROOT / "apiproxy").rglob("*.xml")):
+        text = without_comments(path.read_text(encoding="utf-8"))
+        for match in re.finditer(r"jwt\.[A-Za-z0-9\-]+\.[A-Za-z0-9_.]+", text):
+            refs.append((path.name, match.group(0)))
+    assert refs, "no jwt flow variable in the bundle, so this check graded nothing"
+    for where, ref in refs:
+        parts = ref.split(".")
+        assert parts[2:4] == ["decoded", "claim"], (
+            "%s references %s, which is not the documented family" % (where, ref))
+        assert parts[4] in ("sub", "aud", "exp", "iss", "nbf", "iat"), ref
+
+
+def test_the_legacy_claim_names_appear_nowhere_in_the_bundle():
+    """claim.expiry is milliseconds and decoded.claim.exp is seconds."""
+    legacy = ("claim.expiry", "claim.subject", "claim.audience", "claim.issuer",
+              "claim.issuedat", "claim.notbefore")
+    for path in sorted((ROOT / "apiproxy").rglob("*.xml")):
+        # The VJ-Tenant comment names these on purpose, as the trap beside the
+        # documented family, so the prose is stripped before the search.
+        text = without_comments(path.read_text(encoding="utf-8"))
+        for name in legacy:
+            assert name not in text, "%s references %s" % (path.name, name)
+
+
 def test_the_apigee_resources_are_all_declared():
     text = apigee_tf()
     for resource in ("google_apigee_organization", "google_apigee_instance",

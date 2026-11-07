@@ -11,14 +11,23 @@
   claim is valid and this policy has no element that refuses it. RF-NoExpiry
   in the proxy PreFlow is the refusal.
 
-  TODO: the flow variable name for a decoded claim is the one piece of this
-  bundle not read off a vendor page. The condition in proxies/default.xml and
-  the Identifier in Q-TenantBudget both use jwt.VJ-Tenant.decoded.claim.exp
-  and .sub, which follows the jwt.POLICYNAME. prefix the page uses for valid.
-  Confirm both against a deployed proxy before trusting them, because a
-  condition on an unresolved variable is a condition that is false, and a
-  false condition on RF-NoExpiry means a token with no expiry is admitted.
-  That is the one way this bundle can fail quietly.
+  The decoded claim variable name was a pattern match for one day and it is
+  now read off the policy's own page, which prints the pattern as
+  jwt.{policy_name}.{variable_name} and gives a worked example storing the
+  subject at jwt.jwt-parse-token.decoded.claim.sub. So the spellings in
+  proxies/default.xml and in Q-TenantBudget are the documented ones. See
+  semantics.verifyjwt.decoded_claim_variable.
+
+  The near miss is worth knowing. Dropping decoded from the name does not give
+  a shorter alias. It gives a different family that renames the registered
+  claims, so exp becomes claim.expiry and sub becomes claim.subject. That
+  family also reports times in milliseconds rather than seconds.
+
+  TODO: still unconfirmed against Apigee X. The page is Edge, which is the
+  same gap every other default in this bundle has, so it is tracked with them
+  rather than on its own. The reason this one mattered more is that a
+  condition on an unresolved variable is false, and a false condition on
+  RF-NoExpiry admits a token with no expiry.
 -->
 <VerifyJWT async="false" continueOnError="false" enabled="true" name="VJ-Tenant">
     <DisplayName>Verify tenant token</DisplayName>
