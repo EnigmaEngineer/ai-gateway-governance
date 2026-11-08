@@ -202,3 +202,33 @@ def test_server_context_turns_client_verification_on_and_off(certs):
     assert mtls.server_context(ca, cert, key).verify_mode == ssl.CERT_REQUIRED
     permissive = mtls.server_context(ca, cert, key, require_client_cert=False)
     assert permissive.verify_mode == ssl.CERT_NONE
+
+
+def test_the_refusal_a_check_reads_is_the_one_that_reproduces(manifests):
+    """A re-measure moved two leaf values and both were an exception class.
+
+    Seven arms ran again on the same machine with every verdict unchanged, and
+    `failure` went from SSLError to SSLEOFError on the two arms where the
+    server rejects the client. That is the late TLS 1.3 alert arriving as a
+    close rather than as an alert record, which is a race. A published figure
+    has to re-derive, so the stable field is what this grades and the class is
+    kept for a reader.
+    """
+    m = manifests["mtls"]
+    assert m["failure_class_is_not_stable"] is True, (
+        "the manifest no longer says the class moves, and it has")
+    refused = [a for a in m["arms"] if a["exchange"] == "refused"]
+    assert refused, "no arm was refused, so this check graded nothing"
+    for arm in refused:
+        assert isinstance(arm["refused_after_the_handshake"], bool), (
+            "%s carries no stable refusal side" % arm["arm"])
+    assert m["refusals_after_the_handshake"] == 2, (
+        "two arms are the server rejecting the client and the manifest counts %d"
+        % m["refusals_after_the_handshake"])
+    assert m["refusals_at_the_handshake"] == 2, (
+        "two arms are the client rejecting the server and the manifest counts %d"
+        % m["refusals_at_the_handshake"])
+    answered = [a for a in m["arms"] if a["exchange"] == "answered"]
+    for arm in answered:
+        assert arm["refused_after_the_handshake"] is None, (
+            "%s answered and still carries a refusal side" % arm["arm"])

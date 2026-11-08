@@ -52,8 +52,18 @@ def exchange(port, context, server_hostname):
     request got an answer back. Under TLS 1.3 the server's verdict on a client
     certificate can arrive after the handshake has already returned, so a
     probe that stops at the first half reads a refusal as a success.
+
+    `failure` is the exception class and it is NOT stable. A re-measure ran
+    the same seven arms on the same machine and two leaf values moved out of
+    86. Both are this field, on the two arms where the server rejects the
+    client. Both went from SSLError to SSLEOFError. That is
+    the late alert above arriving as a close rather than as an alert record,
+    and which one lands first is a race. So the field is kept for a reader and
+    `refused_after_the_handshake` is what a check reads, because a figure a
+    manifest publishes has to re-derive and a class name here does not.
     """
     out = {"handshake": None, "exchange": None, "failure": None,
+           "refused_after_the_handshake": None,
            "status": None, "caller": None}
     try:
         raw = socket.create_connection(("127.0.0.1", port), timeout=5)
@@ -98,13 +108,26 @@ def exchange(port, context, server_hostname):
         out["exchange"] = "refused"
         out["failure"] = "the backend closed without answering"
         return out
-    head, _, payload = raw_response.partition(b"\r\n\r\n")
+    head, _, payload = raw_response.partition(b"\r\n\r\n")  # noqa: E501
     out["exchange"] = "answered"
     out["status"] = int(head.split(b" ")[1])
     try:
         out["caller"] = json.loads(payload).get("caller")
     except ValueError:
         out["caller"] = None
+    return out
+
+
+def with_stable_refusal(out):
+    """Add the field a check is allowed to read.
+
+    True means the TLS handshake returned and the request was still refused,
+    which is the server rejecting the client. False means the refusal arrived
+    at the handshake, which is the client rejecting the server. None means
+    nothing was refused.
+    """
+    if out["exchange"] == "refused":
+        out["refused_after_the_handshake"] = out["handshake"] == "completed"
     return out
 
 
@@ -168,7 +191,7 @@ def main():
              soft_port, no_client_cert(ca), "localhost", "answered"),
         ]
         for label, port, context, name, expected in plan:
-            result = exchange(port, context, name)
+            result = with_stable_refusal(exchange(port, context, name))
             result["arm"] = label
             result["server_hostname_sent"] = name
             result["expected"] = expected
@@ -196,11 +219,19 @@ def main():
         "handshake_completed_but_exchange_refused": sorted(
             a["arm"] for a in arms
             if a["handshake"] == "completed" and a["exchange"] == "refused"),
+        "refusals_after_the_handshake": sum(
+            1 for a in arms if a.get("refused_after_the_handshake") is True),
+        "refusals_at_the_handshake": sum(
+            1 for a in arms if a.get("refused_after_the_handshake") is False),
+        "failure_class_is_not_stable": True,
         "note": (
             "Every refusal is reported beside a control that got through for "
             "the mirrored reason. The two no certificate arms differ only in "
             "the server's verify_mode, and the two wrong name arms differ only "
-            "in the client's check_hostname."),
+            "in the client's check_hostname. The failure field on each arm is "
+            "the exception class and it moved on a re-measure without "
+            "any arm changing its verdict, so a check reads "
+            "refused_after_the_handshake instead."),
     }
 
     problems = check(manifest, by_label)

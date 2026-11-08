@@ -130,3 +130,29 @@ which is how the probe proves that arm reached the handler at all.
   one machine. A cluster introduces a load balancer that may terminate TLS, and
   terminating TLS in front of a backend that wants a client certificate is the
   obvious way to delete this control by accident.
+
+## What the re-measure moved, and why it is in the manifest's note
+
+Every script in this repository ran again on the last day of the build and the
+manifests were diffed against the morning's copies. Nine of eleven came back
+with every leaf value identical. `mtls.json` moved by two values out of 86.
+
+Both are the `failure` field, on the two arms where the server rejects the
+client, and both went from `SSLError` to `SSLEOFError`. No arm changed its
+verdict. Nothing changed in the code.
+
+That field is the exception class Python raised, and under TLS 1.3 the
+server's rejection arrives after `wrap_socket` has returned. Whether it lands
+as an alert record or as a close is a race, so the class is a race outcome
+rather than a property of the arm. A check written against it would be flaky
+and would look like coverage.
+
+So the probe now derives `refused_after_the_handshake` from the two halves it
+already records, the manifest carries a field saying the class is not stable,
+and `tests/test_mtls.py` grades the derived one. The class stays in the file
+because it is useful to a reader.
+
+The general shape is the rule about a wall time never going in a manifest,
+arriving in a field that is not a number. A committed figure has to re-derive
+on another machine, and an exception class here does not re-derive on the same
+one.
