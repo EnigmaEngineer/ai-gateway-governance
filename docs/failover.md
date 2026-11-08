@@ -157,3 +157,30 @@ shows that lock doing work. The test says so instead of implying otherwise.
 - **Two cores.** A concurrency figure measured on this VM is not one. These
   arms are sequential for that reason, so nothing here says what failover
   costs under load.
+
+## Re-measured, and which figures held
+
+The whole sweep ran again on the last day of the build. All 261 leaf values in
+`failover.json` came back identical, because the manifest carries counts.
+
+The wall times are the interesting half and they live here rather than in the
+manifest. Against a stalling primary the medians per request were these, in
+seconds, with the first run of the sweep beside them.
+
+```
+  timeout   this run   first run
+     0.05     0.0522      0.0516
+     0.1      0.1022      0.1018
+     0.25     0.2522      0.2519
+     0.5      0.5024      0.5020
+```
+
+The figure is the setting plus about two milliseconds on both runs. It
+reproduces because it is mostly the setting.
+
+Against a refusing primary the median went from about 0.0007 to about 0.0012.
+That arm is purely the machine, it has no setting in it, and it moved by most
+of a factor of two in a day on the same hardware. Both are published and
+neither is in the manifest. One of them is worth quoting and the other is
+worth quoting only with the machine named and the spread shown, which is the
+whole reason the rule exists.

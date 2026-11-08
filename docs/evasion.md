@@ -58,3 +58,15 @@ is not a measurement error. Both numbers are correct. They measure different
 things, and only one of them resembles what a stranger sends. A recall figure
 from a corpus the detector's author also wrote is an upper bound, and it should
 be published next to a figure that is not.
+
+## Rebuilding it
+
+```
+python scripts/evade.py --out measurements/evasion.json
+```
+
+Two ordinary attacks in the plainest phrasing sit in the same file and the
+suite fails if either stops firing. Every attempt getting through is also what
+a broken harness looks like, so the pass needs controls like any other
+comparison. Re-measured on the last day of the build with every count
+unchanged.

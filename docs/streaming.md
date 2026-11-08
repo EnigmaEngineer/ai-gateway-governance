@@ -276,3 +276,29 @@ x-guardrail-holdback-chars: 64
   from assessing the request and nothing here attempts it.
 - The oracle is the whole body redactor. Everything the detectors miss outright
   is still missed here, and those figures are in `docs/scoring.md`.
+
+## Re-measured, and the ratio is the part that holds
+
+Every count in `stream-buffers.json` came back identical on the last day of
+the build. The cost figures did not, and the ratio between them did.
+
+Thirty passes an arm across five rotations, one arm per process, medians in
+milliseconds over eight bodies of about 900 characters:
+
+```
+  batch     8.8
+  hb16    337.4      38.3 times the batch arm
+  hb32    367.6      41.8
+  hb64    430.2      48.9
+  hb128   540.0      61.4
+```
+
+The first run of this read 6.3 ms for the batch arm and 304.7 ms at the
+shipped holdback of 64, which is 48.4 times. The two absolute numbers are now
+40 percent higher and the ratio is 48.9. So the ratio is a property of the work
+and the milliseconds are a property of the afternoon.
+
+The holdback also costs more as it widens, which is the other half of the
+drain interval argument. The window is re-scanned on every chunk, so a wider
+holdback scans more text more times. Nothing here measures draining less
+often, and that is the one dimension of the three that is still unswept.

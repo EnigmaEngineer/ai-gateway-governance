@@ -191,11 +191,121 @@
       "gradeable": true,
       "mutation": "the quota policy is left out of the PreFlow",
       "only_the_expected_rule": true
+    },
+    {
+      "expects": "nothing-in-the-bundle-mints-a-token",
+      "findings": [
+        "nothing-in-the-bundle-mints-a-token"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "no endpoint mints a token",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "mint-falls-back-to-the-default-grants",
+      "findings": [
+        "mint-falls-back-to-the-default-grants"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the mint falls back to the default grants",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "mint-lifetime-is-a-system-default",
+      "findings": [
+        "mint-lifetime-is-a-system-default"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the mint has no expiry set",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "mint-hands-the-caller-nothing",
+      "findings": [
+        "mint-hands-the-caller-nothing"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the mint returns no token to the caller",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "mint-sits-behind-token-verification",
+      "findings": [
+        "mint-sits-behind-token-verification"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the mint sits behind access token verification",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "mint-sits-behind-jwt-verification",
+      "findings": [
+        "mint-sits-behind-jwt-verification"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the mint sits behind jwt verification",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "mint-request-is-forwarded-to-a-target",
+      "findings": [
+        "mint-request-is-forwarded-to-a-target"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the mint request is routed to the backend",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "endpoint-declares-no-base-path",
+      "findings": [
+        "endpoint-declares-no-base-path"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the token endpoint declares no base path",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "endpoints-share-a-base-path",
+      "findings": [
+        "endpoints-share-a-base-path"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "both endpoints claim one base path",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "one-base-path-is-inside-another",
+      "findings": [
+        "one-base-path-is-inside-another"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "the token base path sits under the other",
+      "only_the_expected_rule": true
+    },
+    {
+      "expects": "endpoints-share-a-name",
+      "findings": [
+        "endpoints-share-a-name"
+      ],
+      "fired": true,
+      "gradeable": true,
+      "mutation": "both endpoints are called default",
+      "only_the_expected_rule": true
     }
   ],
-  "arms_gradeable": 19,
-  "arms_total": 19,
-  "arms_tripping_only_their_own_rule": 17,
+  "arms_gradeable": 30,
+  "arms_total": 30,
+  "arms_tripping_only_their_own_rule": 28,
   "baseline_exit": 0,
   "baseline_findings": [],
   "control_finding_codes": [
@@ -204,7 +314,12 @@
     "control-not-in-preflow",
     "jwt-no-audience",
     "jwt-no-issuer",
+    "mint-falls-back-to-the-default-grants",
+    "mint-hands-the-caller-nothing",
+    "mint-lifetime-is-a-system-default",
+    "mint-request-is-forwarded-to-a-target",
     "nothing-refuses-a-token-with-no-expiry",
+    "one-base-path-is-inside-another",
     "product-names-no-proxies",
     "quota-has-no-identifier",
     "quota-not-distributed",
@@ -212,10 +327,10 @@
     "spikearrest-has-no-identifier",
     "spikearrest-not-distributed"
   ],
-  "control_finding_count": 14,
+  "control_finding_count": 19,
   "rules_dead": [],
-  "rules_exercised": 19,
+  "rules_exercised": 30,
   "rules_firing_on_the_untouched_bundle": [],
-  "rules_in_the_checker": 19,
+  "rules_in_the_checker": 30,
   "rules_no_arm_exercises": []
 }

@@ -68,3 +68,43 @@ Counts and hashes. Not timings. A count reproduces on another machine and a
 millisecond does not, and `tests/test_measurements.py` fails on a key whose name
 suggests one. Each scored manifest records the hash of the corpus it read, and a
 check rehashes the file so a figure cannot outlive the data behind it.
+
+## The figures
+
+Every number here is a pair of counts from a run on this machine.
+`tests/test_readme.py` re-derives each one from the manifests in
+`measurements/` and fails with the correct value in its message.
+
+| | identifier recall | identifier precision | attack recall | attack precision |
+|---|---|---|---|---|
+| held out slice, 400 rows | 272 / 281 | 286 / 286 | 146 / 152 | 146 / 151 |
+| crude floor, same rows | 99 / 281 | 99 / 114 | 27 / 152 | 27 / 40 |
+
+```
+python corpus/generate.py --seed 23 --rows 400 --out corpus/data/labelled-holdout.jsonl
+python scripts/score.py --corpus corpus/data/labelled-holdout.jsonl --label holdout --out measurements/holdout-patterns.json
+python scripts/score.py --corpus corpus/data/labelled-holdout.jsonl --label holdout --baseline --out measurements/holdout-baseline.json
+python scripts/score.py --corpus corpus/data/labelled-dev.jsonl --label development --out measurements/development-patterns.json
+```
+
+The precision column is the weakest figure here and a perfect score should be
+read as one. It says no prediction landed outside a labelled identifier on
+these 400 rows, and the rows carrying no identifiers are 12 phrases written to
+be plausible rather than adversarial. One was missing until a timestamp turned
+out to redact as an address.
+
+The floor row is a deliberately crude detector. Any run of five or more digits
+is an identifier and three keywords stand in for the attack patterns. It is the
+only figure here that nothing was fitted to.
+
+All five false positives on the attack side are payloads that describe an attack
+instead of attempting one. The service blocks them and attaches a note saying
+so, rather than clearing them, because a filter an attacker switches off by
+writing `for instance` is worth nothing.
+
+Per class recall is in `measurements/holdout-patterns.json`. The weakest class
+is instruction override at 18 of 24, and the evasion pass in `evasion.md` finds
+the same hole from the other side.
+
+Re-measured on the last day of the build. Every count on this page came back
+identical, which is what a manifest of counts over a committed corpus is for.
