@@ -1,5 +1,25 @@
+<!--
+  Two proxy endpoints. The default one carries the governed request path and
+  token carries the mint, and each keeps every control in its own PreFlow.
+
+  The ProxyEndpoints list is here rather than left out. The configuration
+  reference calls it "simply a 'manifest' setting" and says you normally only
+  see it on a proxy created in the management UI, and it does not say whether
+  a second endpoint deploys without being named. Naming both is the reading
+  that cannot be wrong in the direction that matters. See apigee/semantics.py
+  UNANSWERED for the question itself.
+
+  BasePaths is not in the reference's APIProxy table at all, so both paths are
+  listed rather than one. An undocumented element naming half the endpoints is
+  worse than one naming all of them.
+-->
 <APIProxy revision="1" name="ai-gateway">
     <DisplayName>ai-gateway</DisplayName>
-    <Description>Governed front door for LLM traffic. Controls live in the PreFlow.</Description>
+    <Description>Governed front door for LLM traffic. Controls live in each endpoint's PreFlow.</Description>
     <BasePaths>/v1</BasePaths>
+    <BasePaths>/oauth/v1</BasePaths>
+    <ProxyEndpoints>
+        <ProxyEndpoint>default</ProxyEndpoint>
+        <ProxyEndpoint>token</ProxyEndpoint>
+    </ProxyEndpoints>
 </APIProxy>

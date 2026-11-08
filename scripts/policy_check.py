@@ -89,27 +89,80 @@ class Bundle:
             name = el.get("name") or path.stem
             self.policies[name] = el
 
-        self.proxy = None
-        proxy_path = self.root / "proxies" / "default.xml"
-        if proxy_path.is_file():
+        # Every endpoint, not only default.xml. The bundle grew a second one
+        # for the token mint, and a checker reading one file would have graded
+        # the governed path and said nothing about the path that hands out
+        # credentials.
+        self.endpoints = []
+        for path in sorted((self.root / "proxies").glob("*.xml")):
             try:
-                self.proxy = ET.parse(proxy_path).getroot()
+                el = ET.parse(path).getroot()
             except ET.ParseError as exc:
-                self.parse_errors.append("proxies/default.xml: %s" % exc)
+                self.parse_errors.append("proxies/%s: %s" % (path.name, exc))
+                continue
+            self.endpoints.append({
+                "file": "proxies/%s" % path.name,
+                "name": el.get("name") or path.stem,
+                "el": el,
+            })
+
+    @property
+    def proxy(self):
+        """The governed request endpoint, or None.
+
+        Kept as a name because the rules written before there was a second
+        endpoint read it, and because the precondition in main is about there
+        being a request path at all.
+        """
+        for ep in self.endpoints:
+            if ep["file"] == "proxies/default.xml":
+                return ep["el"]
+        return self.endpoints[0]["el"] if self.endpoints else None
 
     def kind(self, step_name):
         el = self.policies.get(step_name)
         return el.tag if el is not None else None
 
-    def preflow_request_steps(self):
-        if self.proxy is None:
-            return []
-        pre = self.proxy.find("./PreFlow/Request")
+    def preflow_request_steps(self, el=None):
+        """The PreFlow request steps of one endpoint, or of every endpoint.
+
+        With no argument this is the union across endpoints, which is what a
+        question like `is this policy on a request path` means now. A question
+        about which requests a control covers has to name its endpoint, and
+        the callers that do pass one.
+        """
+        if el is None:
+            out = []
+            for ep in self.endpoints:
+                out += self.preflow_request_steps(ep["el"])
+            return out
+        pre = el.find("./PreFlow/Request")
         if pre is None:
             return []
         return [s.findtext("Name", "").strip() for s in pre.findall("Step")]
 
-    def conditional_flows(self):
+    def base_path(self, el):
+        return (el.findtext("./HTTPProxyConnection/BasePath") or "").strip()
+
+    def route_targets(self, el):
+        """Each RouteRule with the TargetEndpoint it names, empty for a null route."""
+        return [
+            {"rule": r.get("name") or "",
+             "target": (r.findtext("TargetEndpoint") or "").strip(),
+             "condition": (r.findtext("Condition") or "").strip()}
+            for r in el.findall("RouteRule")
+        ]
+
+    def oauth_operations(self, step_names):
+        """The OAuthV2 Operation of each named step, for the steps that are OAuthV2."""
+        out = {}
+        for name in step_names:
+            el = self.policies.get(name)
+            if el is not None and el.tag == "OAuthV2":
+                out[name] = (el.findtext("Operation") or "").strip()
+        return out
+
+    def conditional_flows(self, el=None):
         """Each conditional flow with the steps attached to it.
 
         The flows documentation says one conditional flow runs per segment,
@@ -117,10 +170,12 @@ class Bundle:
         that condition is true. Both halves matter. The first means a later
         flow can be unreachable. The second means anything here is skippable.
         """
-        if self.proxy is None:
+        if el is None:
+            el = self.proxy
+        if el is None:
             return []
         out = []
-        for flow in self.proxy.findall("./Flows/Flow"):
+        for flow in el.findall("./Flows/Flow"):
             req = flow.find("Request")
             steps = [s.findtext("Name", "").strip() for s in req.findall("Step")] if req is not None else []
             out.append({
@@ -130,7 +185,7 @@ class Bundle:
             })
         return out
 
-    def steps_with_conditions(self):
+    def steps_with_conditions(self, el=None):
         """PreFlow request steps that carry their own Condition.
 
         A conditioned Step inside the PreFlow is always reached and does not
@@ -138,9 +193,11 @@ class Bundle:
         the same hazard. RF-NoExpiry is deliberately one of these, so the
         checker reports them rather than failing on them.
         """
-        if self.proxy is None:
+        if el is None:
+            el = self.proxy
+        if el is None:
             return []
-        pre = self.proxy.find("./PreFlow/Request")
+        pre = el.find("./PreFlow/Request")
         if pre is None:
             return []
         out = []
@@ -161,32 +218,34 @@ def check_flow_placement(b):
     findings = []
     pre = b.preflow_request_steps()
 
-    for flow in b.conditional_flows():
-        for step in flow["steps"]:
-            if b.kind(step) in ENFORCING:
-                findings.append(Finding(
-                    "control-in-conditional-flow",
-                    "proxies/default.xml flow %s step %s" % (flow["name"], step),
-                    "a control on a conditional flow runs only when that flow's condition is "
-                    "true, so requests matching an earlier flow skip it",
-                    "flow.conditional_runs_only_when_true",
-                ))
+    for ep in b.endpoints:
+        for flow in b.conditional_flows(ep["el"]):
+            for step in flow["steps"]:
+                if b.kind(step) in ENFORCING:
+                    findings.append(Finding(
+                        "control-in-conditional-flow",
+                        "%s flow %s step %s" % (ep["file"], flow["name"], step),
+                        "a control on a conditional flow runs only when that flow's condition is "
+                        "true, so requests matching an earlier flow skip it",
+                        "flow.conditional_runs_only_when_true",
+                    ))
 
-    # A second flow whose condition repeats an earlier one never executes, so
-    # a reviewer reading it as covered is reading a dead branch.
-    seen = {}
-    for flow in b.conditional_flows():
-        cond = flow["condition"]
-        if cond and cond in seen:
-            findings.append(Finding(
-                "unreachable-conditional-flow",
-                "proxies/default.xml flow %s" % flow["name"],
-                "its condition repeats flow %s, and one conditional flow runs per segment, "
-                "so this one never executes" % seen[cond],
-                "flow.one_conditional_per_segment",
-            ))
-        elif cond:
-            seen[cond] = flow["name"]
+        # A second flow whose condition repeats an earlier one never executes,
+        # so a reviewer reading it as covered is reading a dead branch. The
+        # scope is one endpoint, because two endpoints are two segments.
+        seen = {}
+        for flow in b.conditional_flows(ep["el"]):
+            cond = flow["condition"]
+            if cond and cond in seen:
+                findings.append(Finding(
+                    "unreachable-conditional-flow",
+                    "%s flow %s" % (ep["file"], flow["name"]),
+                    "its condition repeats flow %s, and one conditional flow runs per segment, "
+                    "so this one never executes" % seen[cond],
+                    "flow.one_conditional_per_segment",
+                ))
+            elif cond:
+                seen[cond] = flow["name"]
 
     for name, el in sorted(b.policies.items()):
         if el.tag in ENFORCING and name not in pre:
@@ -284,7 +343,9 @@ def check_token_verification(b):
     # bundle carrying VerifyJWT needs a separate refusal or it admits tokens
     # that never expire.
     if jwts:
-        conditioned = b.steps_with_conditions()
+        conditioned = []
+        for ep in b.endpoints:
+            conditioned += b.steps_with_conditions(ep["el"])
         guards_expiry = any(
             "exp" in c["condition"] and ("null" in c["condition"] or "!=" in c["condition"])
             for c in conditioned
@@ -297,6 +358,150 @@ def check_token_verification(b):
                 "it, so with no step testing exp a token that never expires is admitted",
                 "verifyjwt.expiry.checked_only_if_present",
             ))
+    return findings
+
+
+
+def check_token_endpoint(b):
+    """The mint. Three defaults, two placements, and the absence that was the gap.
+
+    VerifyAccessToken shipped before anything that issues a token. No check in
+    this repository could see that, which is the point worth keeping. Every
+    other rule here reads an element that is present and asks whether its
+    value is the one somebody chose. This one asks whether a step exists at
+    all, and a gate that only grades what is in the file cannot ask that.
+    """
+    findings = []
+    minting = []
+    for ep in b.endpoints:
+        steps = b.preflow_request_steps(ep["el"])
+        ops = b.oauth_operations(steps)
+        if "GenerateAccessToken" in ops.values():
+            minting.append((ep, steps, ops))
+
+    verifies = any(
+        "VerifyAccessToken" in b.oauth_operations(b.preflow_request_steps(ep["el"])).values()
+        for ep in b.endpoints
+    )
+    if verifies and not minting:
+        findings.append(Finding(
+            "nothing-in-the-bundle-mints-a-token",
+            "proxies/",
+            "a step verifies access tokens and no step generates one, so every caller has "
+            "to already hold a token this bundle does not issue",
+            "oauthv2.supportedgranttypes.absent_means",
+        ))
+
+    for ep, steps, ops in minting:
+        for step, op in sorted(ops.items()):
+            if op != "GenerateAccessToken":
+                continue
+            el = b.policies[step]
+            if el.find("./SupportedGrantTypes/GrantType") is None:
+                findings.append(Finding(
+                    "mint-falls-back-to-the-default-grants",
+                    "policies/%s.xml" % step,
+                    "with no SupportedGrantTypes the only allowed grants are the two "
+                    "interactive ones, so a service to service caller is refused and a "
+                    "browser redirect flow is what deployed",
+                    "oauthv2.supportedgranttypes.absent_means",
+                ))
+            if el.find("ExpiresIn") is None:
+                findings.append(Finding(
+                    "mint-lifetime-is-a-system-default",
+                    "policies/%s.xml" % step,
+                    "with no ExpiresIn the lifetime comes from a platform setting the "
+                    "page gives no number for, so the token's expiry is not a value "
+                    "anybody here chose",
+                    "oauthv2.expiresin.absent_means",
+                ))
+            gen = el.find("GenerateResponse")
+            if gen is None or (gen.get("enabled") or "true").lower() != "true":
+                findings.append(Finding(
+                    "mint-hands-the-caller-nothing",
+                    "policies/%s.xml" % step,
+                    "GenerateResponse defaults to false, so the policy populates flow "
+                    "variables and returns no token, and every step still reports success",
+                    "oauthv2.generateresponse.default",
+                ))
+
+        if any(op in ("VerifyAccessToken",) for op in ops.values()):
+            findings.append(Finding(
+                "mint-sits-behind-token-verification",
+                "%s PreFlow" % ep["file"],
+                "the endpoint that issues a token also verifies one on the way in, so a "
+                "caller needs a token to get a token",
+                "flow.preflow_always_runs",
+            ))
+        for step in steps:
+            if b.kind(step) == "VerifyJWT":
+                findings.append(Finding(
+                    "mint-sits-behind-jwt-verification",
+                    "%s PreFlow step %s" % (ep["file"], step),
+                    "the endpoint that issues a token verifies a JWT first, so nothing can "
+                    "reach the mint without already holding a credential",
+                    "flow.preflow_always_runs",
+                ))
+        routed = [r for r in b.route_targets(ep["el"]) if r["target"]]
+        if routed:
+            findings.append(Finding(
+                "mint-request-is-forwarded-to-a-target",
+                "%s RouteRule %s" % (ep["file"], routed[0]["rule"]),
+                "the mint endpoint routes to %s, so a request carrying a client secret "
+                "reaches a backend that has no use for it. A null RouteRule is the "
+                "documented shape" % routed[0]["target"],
+                "routerule.null_forwards_nothing",
+            ))
+    return findings
+
+
+def check_endpoints(b):
+    """Two endpoints, and the two things that go wrong between them."""
+    findings = []
+    paths = []
+    for ep in b.endpoints:
+        bp = b.base_path(ep["el"])
+        if not bp:
+            findings.append(Finding(
+                "endpoint-declares-no-base-path",
+                "%s HTTPProxyConnection" % ep["file"],
+                "BasePath is required and defaults to a bare slash, which puts this "
+                "endpoint in front of every path in the environment",
+                "proxyendpoint.basepath_unique_in_environment",
+            ))
+            continue
+        paths.append((ep, bp))
+
+    for i, (ep, bp) in enumerate(paths):
+        for other, obp in paths[i + 1:]:
+            if bp == obp:
+                findings.append(Finding(
+                    "endpoints-share-a-base-path",
+                    "%s and %s" % (ep["file"], other["file"]),
+                    "both declare %s and a base path has to be unique in an environment, "
+                    "so one of them does not deploy" % bp,
+                    "proxyendpoint.basepath_unique_in_environment",
+                ))
+            elif obp.startswith(bp.rstrip("/") + "/") or bp.startswith(obp.rstrip("/") + "/"):
+                findings.append(Finding(
+                    "one-base-path-is-inside-another",
+                    "%s %s and %s %s" % (ep["file"], bp, other["file"], obp),
+                    "the reference does not say which endpoint serves a request when one "
+                    "base path is a prefix of another, so which controls run is decided "
+                    "by something nobody here can read",
+                    "proxyendpoint.basepath_unique_in_environment",
+                ))
+
+    names = {}
+    for ep in b.endpoints:
+        if ep["name"] in names:
+            findings.append(Finding(
+                "endpoints-share-a-name",
+                "%s and %s" % (names[ep["name"]], ep["file"]),
+                "a ProxyEndpoint name has to be unique within the proxy configuration",
+                "proxyendpoint.name_unique_across_endpoints",
+            ))
+        names[ep["name"]] = ep["file"]
     return findings
 
 
@@ -395,19 +600,26 @@ def main():
     # produce no findings, which is indistinguishable from a clean bundle.
     # This is the shape that let a broken control arm report clean once, and an
     # empty input report clean before that.
-    if not b.policies or b.proxy is None:
-        print("graded nothing: %d policies and %s proxy endpoint, so no verdict is available"
-              % (len(b.policies), "no" if b.proxy is None else "a"), file=sys.stderr)
+    if not b.policies or not b.endpoints:
+        print("graded nothing: %d policies and %d proxy endpoints, so no verdict is available"
+              % (len(b.policies), len(b.endpoints)), file=sys.stderr)
         return 2
     if not b.preflow_request_steps():
-        print("the proxy endpoint has no PreFlow request steps, so there is no request path "
+        print("no proxy endpoint has PreFlow request steps, so there is no request path "
               "to grade", file=sys.stderr)
+        return 2
+    bare = [ep["file"] for ep in b.endpoints if not b.preflow_request_steps(ep["el"])]
+    if bare:
+        print("these endpoints present no PreFlow request path, so they were not graded: %s"
+              % ", ".join(bare), file=sys.stderr)
         return 2
 
     findings = []
     findings += check_flow_placement(b)
     findings += check_rate_controls(b)
     findings += check_token_verification(b)
+    findings += check_token_endpoint(b)
+    findings += check_endpoints(b)
     findings += check_response_cache(b)
     product_count = 0
     if pathlib.Path(args.products).is_file():
@@ -417,9 +629,13 @@ def main():
     graded = {
         "policies": len(b.policies),
         "enforcing_policies": sum(1 for e in b.policies.values() if e.tag in ENFORCING),
+        "proxy_endpoints": len(b.endpoints),
         "preflow_request_steps": len(b.preflow_request_steps()),
-        "conditional_flows": len(b.conditional_flows()),
-        "conditioned_preflow_steps": len(b.steps_with_conditions()),
+        "conditional_flows": sum(len(b.conditional_flows(ep["el"])) for ep in b.endpoints),
+        "conditioned_preflow_steps": sum(
+            len(b.steps_with_conditions(ep["el"])) for ep in b.endpoints),
+        "null_route_rules": sum(
+            1 for ep in b.endpoints for r in b.route_targets(ep["el"]) if not r["target"]),
         "products": product_count,
     }
 

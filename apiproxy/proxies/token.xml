@@ -1,0 +1,60 @@
+<!--
+  The token endpoint, as a second ProxyEndpoint rather than a flow on the
+  first one.
+
+  The reason is the rule the other endpoint is built on. Every control there
+  sits in the PreFlow, because a control on a conditional flow is a control
+  some requests skip. A token endpoint cannot live under that PreFlow. The
+  request that mints a token must not be asked for a token, and the quota is
+  keyed on a claim out of the verified token, so on this path the identifier
+  resolves to nothing. Putting the mint behind a condition would have been the
+  obvious move and it breaks the one invariant that makes the enforcement
+  readable off the file.
+
+  So the bundle has two endpoints and each one keeps every control in its own
+  PreFlow. The configuration reference says a ProxyEndpoint name "Must be
+  unique within the API proxy configuration, when (in rare cases) multiple
+  ProxyEndpoints are defined", which is the page acknowledging this shape
+  without recommending it.
+
+  The base path does not overlap the other endpoint's. BasePath "must be
+  unique within an environment" and the reference says nothing about which
+  endpoint serves a request when one base path is a prefix of another. So
+  /oauth/v1 rather than /v1/oauth, and the question stays unanswered rather
+  than answered by a guess. Same move as the response cache placement.
+
+  There is no TargetEndpoint. "A null RouteRule can be defined to support
+  scenarios in which the request message does not need to be forwarded to the
+  TargetEndpoint", and the page's own example is <RouteRule name="GoNowhere"/>.
+  A mint request reaching the model provider would be a credential handed to a
+  backend that has no use for it.
+-->
+<ProxyEndpoint name="token">
+    <PreFlow name="PreFlow">
+        <Request>
+            <!-- Arrest first, same order and same reason as the other
+                 endpoint. An unauthenticated flood against the mint costs a
+                 rate check rather than a credential lookup. The identifier is
+                 the tenant header, which is caller supplied here and is also
+                 caller supplied there. -->
+            <Step>
+                <Name>SA-PerClient</Name>
+            </Step>
+            <Step>
+                <Name>OA-GenerateToken</Name>
+            </Step>
+        </Request>
+        <Response/>
+    </PreFlow>
+    <!-- Nothing conditional. A flow here would be a second place to look for
+         what is enforced. -->
+    <Flows/>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+    <HTTPProxyConnection>
+        <BasePath>/oauth/v1</BasePath>
+    </HTTPProxyConnection>
+    <RouteRule name="no-target"/>
+</ProxyEndpoint>

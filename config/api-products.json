@@ -5,19 +5,32 @@
       "name": "ai-gateway-chat",
       "displayName": "Chat completions",
       "approvalType": "manual",
-      "apiProxies": ["ai-gateway"],
-      "environments": ["prod"],
-      "resourcePaths": ["/chat/completions"],
+      "apiProxies": [
+        "ai-gateway"
+      ],
+      "environments": [
+        "prod"
+      ],
+      "resourcePaths": [
+        "/chat/completions"
+      ],
       "why": "Explicit paths rather than a wildcard. The products page says a resource path of / supports the base path and all subpaths, and that less specific paths take precedence over more specific ones, so a single / beside anything else makes the rest decoration."
     },
     {
       "name": "ai-gateway-embeddings",
       "displayName": "Embeddings",
       "approvalType": "manual",
-      "apiProxies": ["ai-gateway"],
-      "environments": ["prod"],
-      "resourcePaths": ["/embeddings"],
+      "apiProxies": [
+        "ai-gateway"
+      ],
+      "environments": [
+        "prod"
+      ],
+      "resourcePaths": [
+        "/embeddings"
+      ],
       "why": "Separate product so a key for embeddings cannot reach completions, which is the expensive route."
     }
-  ]
+  ],
+  "mintNote": "No product names the mint path and nothing on the mint endpoint verifies a token, so no product check runs there. That is deliberate. A product names proxies and resource paths, this proxy now has two base paths, and the products page speaks of the base path in the singular. It does not say which base path a resource path is relative to when an endpoint has more than one. See apigee/semantics.py UNANSWERED."
 }

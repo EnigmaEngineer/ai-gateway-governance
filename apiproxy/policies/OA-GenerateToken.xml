@@ -1,0 +1,58 @@
+<!--
+  Mints an access token for the client credentials grant. The verification half
+  shipped first and no way to get a token came with it, so a caller had to
+  already hold one from somewhere this repository does not build.
+
+  Four elements here are present because their absence is the behaviour
+  nobody chose.
+
+  SupportedGrantTypes is Presence Required and the page still names a default.
+  "If no supported grant types are specified, then the only allowed grant
+  types are authorization_code and implicit." So a GenerateAccessToken policy
+  written without it mints tokens for two interactive grants and refuses the
+  one a service to service caller uses. The element is the whole difference
+  between a token endpoint for machines and a token endpoint for browsers.
+
+  ExpiresIn is in milliseconds and the response field is in seconds. The page
+  says so in two sentences a paragraph apart. It also says that without the
+  element "the system applies a default value configured at the system level"
+  and gives no number for it, so a token endpoint shipped without ExpiresIn
+  has a lifetime nobody here can state. 3600000 is one hour. A value of -1
+  takes the platform maximum and reports expires_in as 0, and any other
+  negative or zero is a deployment error rather than a runtime one.
+
+  GenerateResponse defaults to false, which populates flow variables and
+  returns nothing to the caller. A token endpoint that mints a token and does
+  not hand it over is the shape of this defect that is hardest to see, because
+  every policy succeeded.
+
+  GenerateErrorResponse defaults to false too. With it off, a refusal reaches
+  the caller as whatever the proxy does with an unhandled fault.
+
+  TODO: where the client secret is read from is not documented on the
+  OAuthV2 page. ClientId has an element, a default of
+  request.formparam.client_id, and a sentence saying any other variable is
+  unsupported. There is no matching element for the secret and no sentence
+  naming its source. The only mention on the page sits in the invalid_client
+  fault row, which says these values are typically sent as a Base64 encoded
+  Basic Authorization header. Typically is not a specification, so this bundle
+  does not add a BasicAuthentication policy on the strength of it. See
+  apigee/semantics.py UNANSWERED.
+-->
+<OAuthV2 async="false" continueOnError="false" enabled="true" name="OA-GenerateToken">
+    <DisplayName>Mint an access token</DisplayName>
+    <Operation>GenerateAccessToken</Operation>
+    <SupportedGrantTypes>
+        <GrantType>client_credentials</GrantType>
+    </SupportedGrantTypes>
+    <!-- Named although it is the default, because the element is doing work.
+         It says the grant type arrives as a form parameter in the request
+         body rather than as a query parameter. -->
+    <GrantType>request.formparam.grant_type</GrantType>
+    <!-- The only supported value. The page says setting ClientId to any
+         other variable is not supported. -->
+    <ClientId>request.formparam.client_id</ClientId>
+    <ExpiresIn>3600000</ExpiresIn>
+    <GenerateResponse enabled="true"/>
+    <GenerateErrorResponse enabled="true"/>
+</OAuthV2>

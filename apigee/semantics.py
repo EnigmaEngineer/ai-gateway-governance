@@ -21,6 +21,7 @@ until somebody checks an X organisation. See docs/apigee.md.
 EDGE_DOCS = "https://docs.apigee.com/api-platform/reference/policies/"
 EDGE_FLOWS = "https://docs.apigee.com/api-platform/fundamentals/flow-configurations"
 EDGE_PRODUCTS = "https://docs.apigee.com/api-platform/publish/create-api-products"
+EDGE_PROXY_REF = "https://docs.apigee.com/api-platform/reference/api-proxy-configuration-reference"
 
 # True while the defaults below are read from Edge documentation rather than
 # confirmed against an Apigee X organisation. Nothing here can flip it, because
@@ -225,6 +226,114 @@ FACTS = [
         "of sub is claim.subject. Its times are milliseconds where the decoded "
         "family is seconds, so swapping the names moves a figure by a thousand.",
     ),
+    Fact(
+        "oauthv2.supportedgranttypes.absent_means",
+        "authorization_code and implicit",
+        "If no supported grant types are specified, then the only allowed grant types "
+        "are `authorization_code` and `implicit`.",
+        EDGE_DOCS + "oauthv2-policy",
+        "Presence is Required on the page and the page still names a default, so a "
+        "GenerateAccessToken policy written without the element mints tokens for two "
+        "interactive grants and refuses the one a service caller uses.",
+    ),
+    Fact(
+        "oauthv2.granttype.ref.default",
+        "request.formparam.grant_type",
+        "Tells the policy where to find the grant type parameter that is passed in a request.",
+        EDGE_DOCS + "oauthv2-policy",
+        "The page's own example reads it from request.queryparam.grant_type instead, so "
+        "the element is doing work even when it is set to its default.",
+    ),
+    Fact(
+        "oauthv2.clientid.only_supported_variable",
+        "request.formparam.client_id",
+        "Setting `ClientId` to any other variable is not supported.",
+        EDGE_DOCS + "oauthv2-policy",
+    ),
+    Fact(
+        "oauthv2.expiresin.units",
+        "milliseconds",
+        "Enforces the expiry time of access tokens and authorization codes in milliseconds.",
+        EDGE_DOCS + "oauthv2-policy",
+        "The response field is seconds. The page says the value is in milliseconds and "
+        "that expires_in is expressed in seconds, two sentences apart. Same factor of a "
+        "thousand as the legacy claim family.",
+    ),
+    Fact(
+        "oauthv2.expiresin.absent_means",
+        "a system level default with no published number",
+        "If `<ExpiresIn>` is not specified, the system applies a default value configured "
+        "at the system level.",
+        EDGE_DOCS + "oauthv2-policy",
+        "So a token endpoint shipped without the element has a lifetime this repository "
+        "cannot state. A value of -1 takes the platform maximum and reports expires_in as "
+        "0, and the page says any other negative integer or zero causes a deployment error.",
+    ),
+    Fact(
+        "oauthv2.generateresponse.default",
+        False,
+        "If set to `true`, the policy generates and returns a response.",
+        EDGE_DOCS + "oauthv2-policy",
+        "Default false. With it off the policy populates flow variables and hands the "
+        "caller nothing, so a mint that worked looks like a mint that did nothing.",
+    ),
+    Fact(
+        "oauthv2.generateerrorresponse.default",
+        False,
+        "If set to `true`, the policy generates and returns a response if the "
+        "ContinueOnError attribute is set to true.",
+        EDGE_DOCS + "oauthv2-policy",
+    ),
+    Fact(
+        "oauthv2.externalauthorization.default",
+        False,
+        "If this element is false or not present, then Edge validates the client_id and "
+        "client_secret normally against the Apigee Edge authorization store.",
+        EDGE_DOCS + "oauthv2-policy",
+        "Left absent on purpose. The alternative hands validation to something this "
+        "repository does not build, and the page says StoreToken has to be true with it.",
+    ),
+    Fact(
+        "oauthv2.token_type_is_not_the_rfc_value",
+        "BearerToken",
+        "Apigee Edge returns the value BearerToken, which is not RFC-compliant.",
+        EDGE_DOCS + "oauthv2-policy",
+        "The vendor says so on its own page. RFC 6750 section 4 spells the type Bearer. "
+        "A client matching token_type exactly against the RFC value refuses a token the "
+        "platform just minted, and nothing in a bundle can change the field.",
+    ),
+    Fact(
+        "proxyendpoint.name_unique_across_endpoints",
+        True,
+        "Must be unique within the API proxy configuration, when (in rare cases) multiple "
+        "ProxyEndpoints are defined.",
+        EDGE_PROXY_REF,
+        "The page acknowledges more than one endpoint per bundle without recommending it.",
+    ),
+    Fact(
+        "proxyendpoint.basepath_unique_in_environment",
+        True,
+        "BasePath must be unique within an environment.",
+        EDGE_PROXY_REF,
+    ),
+    Fact(
+        "routerule.null_forwards_nothing",
+        True,
+        "A null RouteRule can be defined to support scenarios in which the request "
+        "message does not need to be forwarded to the TargetEndpoint.",
+        EDGE_PROXY_REF,
+        "The page's example is <RouteRule name=\"GoNowhere\"/>. It says the request is "
+        "not forwarded and does not say how the response is produced, which is why the "
+        "mint policy sets GenerateResponse rather than relying on the route.",
+    ),
+    Fact(
+        "apiproxy.proxyendpoints_is_a_manifest",
+        "manifest",
+        "This is simply a 'manifest' setting",
+        EDGE_PROXY_REF,
+        "The page says you normally only see the element on a proxy created in the "
+        "management UI. It does not say whether an endpoint deploys without being named.",
+    ),
 ]
 
 BY_KEY = {f.key: f for f in FACTS}
@@ -253,6 +362,44 @@ def value(key):
 # find what was unresolved without reading the audit, and because an answered
 # one is a diff against this list.
 UNANSWERED = {
+    "oauthv2.client_secret_source": (
+        "The OAuthV2 page gives ClientId an element, a default of "
+        "request.formparam.client_id and a sentence saying any other variable is "
+        "unsupported. There is no element for the client secret and no sentence naming "
+        "where it is read from. The only mention is in the invalid_client fault row, "
+        "which says these values are typically sent as a Base64 encoded Basic "
+        "Authorization header. Typically is not a specification, so OA-GenerateToken "
+        "adds no BasicAuthentication policy on the strength of it. This is the first "
+        "gap here that is an absence in the documentation of a required input rather "
+        "than an absence in the configuration."
+    ),
+    "oauthv2.generateaccesstoken_success_status": (
+        "The page shows the JSON body GenerateResponse produces and never gives the HTTP "
+        "status of a successful mint, and never says whether a target is reached. The "
+        "token endpoint therefore carries a null RouteRule, so the answer to the second "
+        "half cannot matter."
+    ),
+    "oauthv2.generateaccesstoken_needs_a_product": (
+        "The page does not say whether the app a mint is for has to be associated with an "
+        "API product, or what happens when it is not. api_product_list is documented as "
+        "the products associated with the token's developer app, and the no product match "
+        "fault is documented under verification rather than minting."
+    ),
+    "product.resource_path_with_two_base_paths": (
+        "A product names proxies and resource paths, and this proxy now has two base "
+        "paths. The products page says a resource path of / supports the base path and "
+        "all subpaths, in the singular. It does not say which base path a resource path "
+        "is relative to when an endpoint has more than one. Splitting the mint onto its "
+        "own endpoint to keep every control in a PreFlow moved this ambiguity into the "
+        "product model, and the mitigation is that no product here names the mint path "
+        "and nothing on that endpoint verifies a token."
+    ),
+    "apiproxy.second_endpoint_must_be_listed": (
+        "The configuration reference calls ProxyEndpoints a manifest setting normally "
+        "seen only on a proxy built in the management UI. It does not say whether a "
+        "second endpoint deploys when the element does not name it. The bundle names "
+        "both, which is the reading that cannot be wrong in the direction that matters."
+    ),
     "responsecache.hit_skips_rest_of_request_flow": (
         "On a cache hit the page says the response returns with no request forwarded to "
         "the backend. It does not say whether the remaining request flow steps run. If "

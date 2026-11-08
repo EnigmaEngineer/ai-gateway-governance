@@ -247,6 +247,96 @@ def m_quota_left_out_of_the_preflow(b):
     return "control-not-in-preflow"
 
 
+
+TOKEN_PROXY = "proxies/token.xml"
+
+
+def token_proxy(bundle):
+    return bundle / "proxies" / "token.xml"
+
+
+def add_step(el, name):
+    """Put a Step on the front of an endpoint's PreFlow request."""
+    pre = el.find("./PreFlow/Request")
+    step = ET.SubElement(pre, "Step")
+    ET.SubElement(step, "Name").text = name
+    pre.remove(step)
+    pre.insert(0, step)
+
+
+def m_no_endpoint_mints_a_token(b):
+    """The bundle as it was before the mint existed."""
+    token_proxy(b).unlink()
+    policy(b, "OA-GenerateToken").unlink()
+    return "nothing-in-the-bundle-mints-a-token"
+
+
+def m_mint_with_no_supported_grants(b):
+    rewrite(policy(b, "OA-GenerateToken"), lambda el: drop(el, "SupportedGrantTypes"))
+    return "mint-falls-back-to-the-default-grants"
+
+
+def m_mint_with_no_expiry_set(b):
+    rewrite(policy(b, "OA-GenerateToken"), lambda el: drop(el, "ExpiresIn"))
+    return "mint-lifetime-is-a-system-default"
+
+
+def m_mint_returns_nothing(b):
+    def mutate(el):
+        el.find("GenerateResponse").set("enabled", "false")
+    rewrite(policy(b, "OA-GenerateToken"), mutate)
+    return "mint-hands-the-caller-nothing"
+
+
+def m_mint_behind_access_token_verification(b):
+    rewrite(token_proxy(b), lambda el: add_step(el, "OA-VerifyToken"))
+    return "mint-sits-behind-token-verification"
+
+
+def m_mint_behind_jwt_verification(b):
+    rewrite(token_proxy(b), lambda el: add_step(el, "VJ-Tenant"))
+    return "mint-sits-behind-jwt-verification"
+
+
+def m_mint_routed_to_the_backend(b):
+    def mutate(el):
+        rule = el.find("RouteRule")
+        ET.SubElement(rule, "TargetEndpoint").text = "default"
+    rewrite(token_proxy(b), mutate)
+    return "mint-request-is-forwarded-to-a-target"
+
+
+def m_token_endpoint_with_no_base_path(b):
+    def mutate(el):
+        drop(el.find("HTTPProxyConnection"), "BasePath")
+    rewrite(token_proxy(b), mutate)
+    return "endpoint-declares-no-base-path"
+
+
+def _set_base_path(b, value):
+    def mutate(el):
+        el.find("./HTTPProxyConnection/BasePath").text = value
+    rewrite(token_proxy(b), mutate)
+
+
+def m_both_endpoints_on_one_base_path(b):
+    _set_base_path(b, "/v1")
+    return "endpoints-share-a-base-path"
+
+
+def m_token_base_path_under_the_other(b):
+    """The spelling that reads natural and leaves the routing undocumented."""
+    _set_base_path(b, "/v1/oauth")
+    return "one-base-path-is-inside-another"
+
+
+def m_two_endpoints_called_default(b):
+    def mutate(el):
+        el.set("name", "default")
+    rewrite(token_proxy(b), mutate)
+    return "endpoints-share-a-name"
+
+
 MUTATIONS = [
     ("quota counts per message processor", m_quota_default_distribution),
     ("quota counter is asynchronous", m_quota_async_counter),
@@ -267,6 +357,17 @@ MUTATIONS = [
     ("the cache has no key at all", m_cache_with_no_key),
     ("a product names no resource paths", m_product_with_no_paths),
     ("the quota policy is left out of the PreFlow", m_quota_left_out_of_the_preflow),
+    ("no endpoint mints a token", m_no_endpoint_mints_a_token),
+    ("the mint falls back to the default grants", m_mint_with_no_supported_grants),
+    ("the mint has no expiry set", m_mint_with_no_expiry_set),
+    ("the mint returns no token to the caller", m_mint_returns_nothing),
+    ("the mint sits behind access token verification", m_mint_behind_access_token_verification),
+    ("the mint sits behind jwt verification", m_mint_behind_jwt_verification),
+    ("the mint request is routed to the backend", m_mint_routed_to_the_backend),
+    ("the token endpoint declares no base path", m_token_endpoint_with_no_base_path),
+    ("both endpoints claim one base path", m_both_endpoints_on_one_base_path),
+    ("the token base path sits under the other", m_token_base_path_under_the_other),
+    ("both endpoints are called default", m_two_endpoints_called_default),
 ]
 
 
@@ -281,6 +382,7 @@ def strip_every_control(b):
         ("SA-PerClient", ("UseEffectiveCount", "Identifier")),
         ("VJ-Tenant", ("Issuer", "Audience")),
         ("RC-Completions", ("ExcludeErrorResponse",)),
+        ("OA-GenerateToken", ("SupportedGrantTypes", "ExpiresIn")),
     ):
         def mutate(el, tags=tags):
             for tag in tags:
@@ -293,6 +395,15 @@ def strip_every_control(b):
             if "claim" in (frag.get("ref") or ""):
                 key.remove(frag)
     rewrite(policy(b, "RC-Completions"), cache_key)
+
+    def mint(el):
+        el.find("GenerateResponse").set("enabled", "false")
+    rewrite(policy(b, "OA-GenerateToken"), mint)
+
+    def token_endpoint(el):
+        el.find("./HTTPProxyConnection/BasePath").text = "/v1/oauth"
+        ET.SubElement(el.find("RouteRule"), "TargetEndpoint").text = "default"
+    rewrite(b / "proxies" / "token.xml", token_endpoint)
 
     def proxy(el):
         req = el.find("./PreFlow/Request")
