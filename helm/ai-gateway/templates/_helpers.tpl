@@ -43,4 +43,13 @@ policy are both allowed and both now take a second value saying so.
 {{- if and (not .Values.networkPolicy.enabled) (not .Values.networkPolicy.acknowledgeClusterWideAccess) -}}
 {{- fail "networkPolicy.enabled is false, so every pod in the cluster can reach the gateway. Set networkPolicy.acknowledgeClusterWideAccess to true if that is the intent." -}}
 {{- end -}}
+{{- if and (not .Values.upstreamTls.enabled) (not .Values.upstreamTls.acknowledgePlaintextBackendHop) -}}
+{{- fail "upstreamTls.enabled is false, so the guardrail reaches the model backend with no client identity and the backend cannot tell it from anything else in the cluster. Set upstreamTls.acknowledgePlaintextBackendHop to true if that is the intent." -}}
+{{- end -}}
+{{- if and .Values.upstreamTls.enabled (not .Values.upstreamTls.secretName) -}}
+{{- fail "upstreamTls.enabled is true and upstreamTls.secretName is empty, so the pod would mount nothing and the guardrail would be handed a certificate path with no file behind it." -}}
+{{- end -}}
+{{- if and .Values.upstreamTls.enabled (or (not .Values.upstreamTls.caKey) (or (not .Values.upstreamTls.certKey) (not .Values.upstreamTls.keyKey))) -}}
+{{- fail "upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a chart that renders two of the three renders a pod that will not start." -}}
+{{- end -}}
 {{- end -}}

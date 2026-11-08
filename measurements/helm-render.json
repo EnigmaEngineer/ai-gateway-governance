@@ -17,6 +17,43 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "documents": 5,
+      "findings": [
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -37,6 +74,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls.enabled is false, so the guardrail reaches the model backend with no client identity and the backend cannot tell i",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -49,6 +113,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -61,6 +152,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -73,6 +191,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -85,6 +230,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -97,6 +269,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -109,6 +308,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -130,6 +356,43 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -142,6 +405,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): networkPolicy.enabled is false, so every pod in the cluster can reach the gateway. Set networkPolicy.acknowledgeClusterWideAcc",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): networkPolicy.enabled is false, so every pod in the cluster can reach the gateway. Set networkPolicy.acknowledgeClusterWideAcc",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -154,6 +444,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -166,6 +483,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -178,6 +522,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -190,6 +561,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -202,6 +600,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -214,6 +639,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -236,6 +688,44 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -248,6 +738,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): service.internal is false, which gives this gateway a public address. Set service.acknowledgeInternetExposure to true if that ",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): service.internal is false, which gives this gateway a public address. Set service.acknowledgeInternetExposure to true if that ",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -260,6 +777,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -272,6 +816,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -284,6 +855,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -296,6 +894,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -308,6 +933,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -320,6 +972,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -342,6 +1021,44 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -354,6 +1071,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): service.internal is false, which gives this gateway a public address. Set service.acknowledgeInternetExposure to true if that ",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): service.internal is false, which gives this gateway a public address. Set service.acknowledgeInternetExposure to true if that ",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -366,6 +1110,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -378,6 +1149,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -390,6 +1188,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -402,6 +1227,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -414,6 +1266,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -426,6 +1305,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guarded",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -446,6 +1352,43 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 5,
+      "findings": [
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -466,6 +1409,43 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 5,
+      "findings": [
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -478,6 +1458,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -490,6 +1497,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -502,6 +1536,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -514,6 +1575,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -526,6 +1614,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -538,6 +1653,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -559,6 +1701,43 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -580,6 +1759,43 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -592,6 +1808,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -604,6 +1847,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -616,6 +1886,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -628,6 +1925,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -640,6 +1964,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -652,6 +2003,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -674,6 +2052,44 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -696,6 +2112,44 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -708,6 +2162,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -720,6 +2201,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -732,6 +2240,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -744,6 +2279,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -756,6 +2318,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -768,6 +2357,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -790,6 +2406,44 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -812,6 +2466,44 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): upstreamTls needs caKey and certKey and keyKey together. gateway/app.py refuses --upstream-cert without --upstream-ca, so a ch",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -824,6 +2516,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -836,6 +2555,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): guardrail.image is empty. No image has been built or pushed for the guardrail yet, because there is no registry to push it to.",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -848,6 +2594,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -860,6 +2633,33 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -872,6 +2672,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -884,6 +2711,33 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_without_acknowledgements",
+      "refused_because": "Error: execution error at (ai-gateway/templates/serviceaccount.yaml:1:4): serviceAccount.gcpServiceAccount is empty. Set it from the terraform output workload_service_account, or the pods authenticate",
+      "rendered": false,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -904,6 +2758,54 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -924,6 +2826,54 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -946,6 +2896,56 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a container image has no name",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a container image has no name",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -968,6 +2968,56 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a container image has no name",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a container image has no name",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -990,6 +3040,56 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1012,6 +3112,56 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1035,6 +3185,58 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a container image has no name",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a container image has no name",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1058,6 +3260,58 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a container image has no name",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a container image has no name",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1079,6 +3333,54 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1100,6 +3402,54 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1122,6 +3472,56 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1144,6 +3544,56 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1166,6 +3616,56 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1188,6 +3688,56 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1211,6 +3761,58 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1234,6 +3836,58 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": true,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": true,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1256,6 +3910,56 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1278,6 +3982,56 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1301,6 +4055,58 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1324,6 +4130,58 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1347,6 +4205,58 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1370,6 +4280,58 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1394,6 +4356,60 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1418,6 +4434,60 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": true,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 5,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "NetworkPolicy",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": true,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1440,6 +4510,56 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1462,6 +4582,56 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1485,6 +4655,58 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1508,6 +4730,58 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": true
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": true
       }
     },
@@ -1531,6 +4805,58 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1554,6 +4880,58 @@
         "guardrail_image_set": true,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": true,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1578,6 +4956,60 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": true,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     },
@@ -1602,11 +5034,65 @@
         "guardrail_image_set": false,
         "networkPolicy.enabled": false,
         "service.internal": false,
+        "upstream_client_identity": "all three",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the secret volume names an empty key, which the API server rejects",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "cert and key only",
+        "workload_identity_set": false
+      }
+    },
+    {
+      "arm": "guard_stubbed",
+      "documents": 4,
+      "findings": [
+        "a LoadBalancer Service with no internal annotation, which gets a public address",
+        "a container image has no name",
+        "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+        "the guardrail passes no client certificate, so the hop to the backend has no identity",
+        "the service account carries no workload identity annotation, so pods hold the node identity"
+      ],
+      "kinds": [
+        "ConfigMap",
+        "Deployment",
+        "Service",
+        "ServiceAccount"
+      ],
+      "rendered": true,
+      "values": {
+        "exposure_acknowledged": false,
+        "guardrail_image_set": false,
+        "networkPolicy.enabled": false,
+        "service.internal": false,
+        "upstream_client_identity": "off",
         "workload_identity_set": false
       }
     }
   ],
-  "combinations": 32,
+  "combinations": 96,
   "dimensions": {
     "exposure_acknowledged": [
       "true",
@@ -1624,38 +5110,55 @@
       "true",
       "false"
     ],
+    "upstream_client_identity": [
+      "all three",
+      "cert and key only",
+      "off"
+    ],
     "workload_identity_set": [
       "true",
       "false"
     ]
   },
-  "distinct_finding_count": 4,
+  "distinct_finding_count": 7,
   "distinct_findings": [
+    "--upstream-ca is passed with no filename behind it, so the service is handed a directory and refuses at startup",
     "a LoadBalancer Service with no internal annotation, which gets a public address",
     "a container image has no name",
     "no NetworkPolicy, so any pod in the cluster can reach the gateway",
+    "the guardrail passes no client certificate, so the hop to the backend has no identity",
+    "the secret volume names an empty key, which the API server rejects",
     "the service account carries no workload identity annotation, so pods hold the node identity"
   ],
   "guard_stubbed": {
-    "exposed_renderings_nobody_acknowledged": 8,
-    "findings_total": 64,
+    "exposed_renderings_nobody_acknowledged": 24,
+    "findings_total": 288,
+    "plaintext_hops_nobody_acknowledged": 16,
     "refused": 0,
-    "rendered": 32,
-    "renderings_with_a_finding": 30
+    "rendered": 96,
+    "renderings_the_service_would_refuse_at_startup": 32,
+    "renderings_with_a_finding": 94,
+    "renderings_with_a_plaintext_backend_hop": 32
   },
   "guard_without_acknowledgements": {
-    "exposed_renderings_nobody_acknowledged": 2,
-    "findings_total": 8,
-    "refused": 24,
-    "rendered": 8,
-    "renderings_with_a_finding": 6
+    "exposed_renderings_nobody_acknowledged": 4,
+    "findings_total": 24,
+    "plaintext_hops_nobody_acknowledged": 4,
+    "refused": 80,
+    "rendered": 16,
+    "renderings_the_service_would_refuse_at_startup": 0,
+    "renderings_with_a_finding": 14,
+    "renderings_with_a_plaintext_backend_hop": 8
   },
   "guarded": {
     "exposed_renderings_nobody_acknowledged": 0,
-    "findings_total": 4,
-    "refused": 27,
-    "rendered": 5,
-    "renderings_with_a_finding": 3
+    "findings_total": 12,
+    "plaintext_hops_nobody_acknowledged": 0,
+    "refused": 87,
+    "rendered": 9,
+    "renderings_the_service_would_refuse_at_startup": 0,
+    "renderings_with_a_finding": 7,
+    "renderings_with_a_plaintext_backend_hop": 4
   },
   "helm_version": "v3.16.3+gcfd0749"
 }

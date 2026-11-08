@@ -91,3 +91,28 @@ networkPolicy:
   # Turning the policy off is the same shape of decision as exposing the
   # service, so it takes the same second value.
   acknowledgeClusterWideAccess: false
+
+upstreamTls:
+  # The client certificate the guardrail presents on the hop to the model
+  # backend. gateway/mtls.py and tests/test_mtls.py carried this before the
+  # chart did, so mutual TLS was in the service and not in the thing that
+  # would actually run.
+  #
+  # Off by default, because a chart that mounts a secret nobody created
+  # renders a pod that will not start. Turning it on is the deployment saying
+  # the secret exists.
+  # On by default. The two values that expose this gateway ship as the safe
+  # setting and take a second value to turn off, and a plaintext hop to the
+  # model backend is the same shape of decision.
+  enabled: true
+  # Turning the client identity off is allowed and it takes an
+  # acknowledgement, like internet exposure and the network policy.
+  acknowledgePlaintextBackendHop: false
+  # Named rather than created here, the same way providerKeySecret is. In a
+  # real deployment the material arrives from Secret Manager through the CSI
+  # driver, and there is no project yet.
+  secretName: ai-gateway-upstream-client
+  caKey: ca.crt
+  certKey: tls.crt
+  keyKey: tls.key
+  mountPath: /etc/ai-gateway/upstream-tls

@@ -58,6 +58,11 @@ DIMENSIONS = {
     # here, which keeps the sweep at 32 arms instead of 64 and still covers
     # the case the first version missed.
     "exposure_acknowledged": [True, False],
+    # The service carried mutual TLS to the backend before the chart did, so
+    # the thing that would actually run had no client identity on that hop.
+    # Three values rather than two, because a boolean cannot express the
+    # pairing the service refuses at startup.
+    "upstream_client_identity": ["all three", "cert and key only", "off"],
 }
 
 GCP_SA = "ai-gateway-workload@example-project.iam.gserviceaccount.com"
@@ -80,11 +85,16 @@ def sets_for(combo):
     renders differently from an empty one.
     """
     ack = str(combo["exposure_acknowledged"]).lower()
+    identity = combo["upstream_client_identity"]
     booleans = [
         "service.internal=%s" % str(combo["service.internal"]).lower(),
         "networkPolicy.enabled=%s" % str(combo["networkPolicy.enabled"]).lower(),
         "service.acknowledgeInternetExposure=%s" % ack,
         "networkPolicy.acknowledgeClusterWideAccess=%s" % ack,
+        "upstreamTls.enabled=%s" % ("false" if identity == "off" else "true"),
+        # The third acknowledgement moves with the other two, for the reason
+        # in the comment above DIMENSIONS.
+        "upstreamTls.acknowledgePlaintextBackendHop=%s" % ack,
     ]
     strings = [
         # The caller ranges are always supplied. The sweep is about the four
@@ -94,6 +104,10 @@ def sets_for(combo):
         "serviceAccount.gcpServiceAccount=%s" % (GCP_SA if combo["workload_identity_set"] else ""),
         "guardrail.image=%s" % (GUARDRAIL_IMAGE if combo["guardrail_image_set"] else ""),
         "guardrail.tag=%s" % ("0.1.0" if combo["guardrail_image_set"] else ""),
+        # Emptying the CA key is the half configured pairing. The service
+        # refuses --upstream-cert without --upstream-ca at startup, so the
+        # question is whether the chart can produce it at all.
+        "upstreamTls.caKey=%s" % ("" if identity == "cert and key only" else "ca.crt"),
     ]
     return booleans, strings
 
@@ -132,6 +146,27 @@ def split_documents(rendered):
     return [d for d in docs if d.strip()]
 
 
+def tls_flag_values(doc):
+    """Pair each --upstream flag in a container's args with the value after it.
+
+    The first version of this matched every list item in the document and
+    zipped the matches in pairs, which only lands the right way round while
+    the number of earlier list items happens to be even. A grader whose
+    correctness is a parity accident is the thing this repository keeps
+    finding in other people's configuration, so it walks the list in order
+    instead and takes the item after a flag it recognises.
+    """
+    items = re.findall(r"^\s*-\s+\"?([^\"\n]*)\"?\s*$", doc, re.M)
+    wanted = ("--upstream-ca", "--upstream-cert", "--upstream-key")
+    out = {}
+    for i, item in enumerate(items):
+        if item in wanted:
+            # A flag as the last item has no value at all, which is itself the
+            # finding rather than a reason to crash.
+            out[item] = items[i + 1].strip() if i + 1 < len(items) else ""
+    return out
+
+
 def kind_of(doc):
     m = re.search(r"^kind:\s*(\S+)", doc, re.M)
     return m.group(1) if m else None
@@ -164,6 +199,29 @@ def grade(rendered):
 
     deployments = [d for d in docs if kind_of(d) == "Deployment"]
     for dep in deployments:
+        # The backend hop. A Deployment passing no client certificate is a
+        # pod whose mutual TLS lives only in the test suite, which is what
+        # this chart shipped for a day.
+        #
+        # The first version of this read the flag names and found nothing,
+        # because emptying the CA key still renders the flag. What it renders
+        # is the mount directory with a trailing slash, so the grader reads
+        # the VALUE. A flag present with a directory behind it is the shape
+        # a name check cannot see.
+        tls_args = tls_flag_values(dep)
+        if "--upstream-cert" not in dep:
+            findings.append("the guardrail passes no client certificate, so the hop to the "
+                            "backend has no identity")
+        else:
+            for flag in ("--upstream-ca", "--upstream-cert", "--upstream-key"):
+                value = tls_args.get(flag, "")
+                if not value or value.endswith("/"):
+                    findings.append("%s is passed with no filename behind it, so the service "
+                                    "is handed a directory and refuses at startup" % flag)
+            if "upstream-tls" not in dep:
+                findings.append("a certificate path is passed and no volume carries the file")
+        if re.search(r"^\s*- key:\s*$", dep, re.M):
+            findings.append("the secret volume names an empty key, which the API server rejects")
         images = re.findall(r'^\s*image:\s*"?([^"\n]*)"?\s*$', dep, re.M)
         if "runAsNonRoot: true" not in dep:
             findings.append("the pod does not declare runAsNonRoot")
@@ -246,13 +304,14 @@ def stub_the_guard(src, dst):
 
 
 def drop_the_acknowledgements(src, dst):
-    """Copy the chart with the guard as it was before the acknowledgements.
+    """Copy the chart with all three acknowledgement conditions removed.
 
-    This arm exists so the claim about the earlier version is a measurement
-    rather than a memory. The first guard refused every empty value and
-    nothing about the value that exposes the service, and that is a property
-    of a chart that can still be built on demand rather than something that
-    happened once this afternoon.
+    This arm exists so the claim about the guard before them is a measurement
+    rather than a memory. A condition that refuses an empty value catches
+    carelessness. The three removed here each refuse a value that has a
+    plausible default and exposes something, and that is a different job. The
+    arm is rebuilt on every run rather than remembered from the afternoon it
+    was first measured.
     """
     shutil.copytree(src, dst)
     helpers = dst / "templates" / "_helpers.tpl"
@@ -261,9 +320,9 @@ def drop_the_acknowledgements(src, dst):
     for condition in re.findall(r"\{\{- if [^\n]*\n\{\{- fail [^\n]*\n\{\{- end -\}\}\n", text):
         if "acknowledge" in condition:
             kept.append(condition)
-    if len(kept) != 2:
+    if len(kept) != 3:
         raise SystemExit(
-            "expected two acknowledgement conditions to remove and found %d, so this arm is not the earlier guard"
+            "expected three acknowledgement conditions to remove and found %d, so this arm is not the earlier guard"
             % len(kept))
     for condition in kept:
         text = text.replace(condition, "")
@@ -338,6 +397,16 @@ def main():
                 1 for a in arms if a["rendered"]
                 and any("public address" in f for f in a["findings"])
                 and not a["values"]["exposure_acknowledged"]),
+            "renderings_with_a_plaintext_backend_hop": sum(
+                1 for a in arms if a["rendered"]
+                and any("no identity" in f for f in a["findings"])),
+            "plaintext_hops_nobody_acknowledged": sum(
+                1 for a in arms if a["rendered"]
+                and any("no identity" in f for f in a["findings"])
+                and not a["values"]["exposure_acknowledged"]),
+            "renderings_the_service_would_refuse_at_startup": sum(
+                1 for a in arms if a["rendered"]
+                and any("refuses at startup" in f for f in a["findings"])),
         }
 
     manifest = {
@@ -359,9 +428,13 @@ def main():
     print("%d combinations over %d values" % (manifest["combinations"], len(DIMENSIONS)))
     for label in ("guarded", "guard_without_acknowledgements", "guard_stubbed"):
         c = manifest[label]
-        print("  %-32s rendered %2d  refused %2d  with a finding %2d  findings %2d  exposed unacknowledged %d"
+        print("  %-32s rendered %3d  refused %3d  with a finding %3d  findings %3d  "
+              "exposed unacknowledged %2d  plaintext hop %2d  unacknowledged %2d  would not start %2d"
               % (label, c["rendered"], c["refused"], c["renderings_with_a_finding"],
-                 c["findings_total"], c["exposed_renderings_nobody_acknowledged"]))
+                 c["findings_total"], c["exposed_renderings_nobody_acknowledged"],
+                 c["renderings_with_a_plaintext_backend_hop"],
+                 c["plaintext_hops_nobody_acknowledged"],
+                 c["renderings_the_service_would_refuse_at_startup"]))
     print("written to %s" % out)
     return 0
 

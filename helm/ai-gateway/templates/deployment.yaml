@@ -50,6 +50,17 @@ spec:
             - {{ .Values.guardrail.port | quote }}
             - "--upstream"
             - "http://127.0.0.1:{{ .Values.portkey.port }}/v1/chat/completions"
+            {{- if .Values.upstreamTls.enabled }}
+            # All three or none. gateway/app.py refuses --upstream-cert
+            # without --upstream-ca at startup, so a chart that can render two
+            # of the three renders a pod that crash loops.
+            - "--upstream-ca"
+            - "{{ .Values.upstreamTls.mountPath }}/{{ .Values.upstreamTls.caKey }}"
+            - "--upstream-cert"
+            - "{{ .Values.upstreamTls.mountPath }}/{{ .Values.upstreamTls.certKey }}"
+            - "--upstream-key"
+            - "{{ .Values.upstreamTls.mountPath }}/{{ .Values.upstreamTls.keyKey }}"
+            {{- end }}
           ports:
             - name: guardrail
               containerPort: {{ .Values.guardrail.port }}
@@ -75,6 +86,11 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            {{- if .Values.upstreamTls.enabled }}
+            - name: upstream-tls
+              mountPath: {{ .Values.upstreamTls.mountPath }}
+              readOnly: true
+            {{- end }}
         - name: portkey
           image: "{{ .Values.portkey.image }}:{{ .Values.portkey.tag }}"
           imagePullPolicy: IfNotPresent
@@ -115,6 +131,22 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
+        {{- if .Values.upstreamTls.enabled }}
+        - name: upstream-tls
+          secret:
+            secretName: {{ .Values.upstreamTls.secretName }}
+            # 0400 rather than the default. The private key is the one file
+            # here that a second process in the pod has no business reading,
+            # and the pod runs as a single non root user.
+            defaultMode: 256
+            items:
+              - key: {{ .Values.upstreamTls.caKey }}
+                path: {{ .Values.upstreamTls.caKey }}
+              - key: {{ .Values.upstreamTls.certKey }}
+                path: {{ .Values.upstreamTls.certKey }}
+              - key: {{ .Values.upstreamTls.keyKey }}
+                path: {{ .Values.upstreamTls.keyKey }}
+        {{- end }}
         - name: gateway-config
           secret:
             secretName: {{ .Values.providerKeySecret.name }}
