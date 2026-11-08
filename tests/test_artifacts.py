@@ -32,12 +32,21 @@ def test_every_measurement_is_named_by_a_script_that_exists(root):
         "these measurement files are not produced by any committed command: %s" % orphans)
 
 
-def test_every_script_the_readme_runs_is_in_the_repository(root):
-    readme = (root / "README.md").read_text(encoding="utf-8")
-    named = set(re.findall(r"(?:python|python3)\s+((?:scripts|corpus)/[A-Za-z0-9_]+\.py)", readme))
-    assert named, "the README names no command, so nothing here is runnable from it"
+def test_every_script_a_published_document_runs_is_in_the_repository(root):
+    """The README and the documents together.
+
+    The measurement sections and their commands moved into docs/, so the
+    front page runs the service and the documents run the measurements.
+    Anchoring this to one filename is what kept them on one page.
+    """
+    docs = [root / "README.md"] + sorted((root / "docs").glob("*.md"))
+    named = set()
+    for path in docs:
+        named |= set(re.findall(r"(?:python|python3)\s+(?:-I\s+)?((?:scripts|corpus)/[A-Za-z0-9_]+\.py)",
+                                path.read_text(encoding="utf-8")))
+    assert named, "nothing published names a command, so nothing here is runnable from it"
     for rel in sorted(named):
-        assert (root / rel).exists(), "the README runs %s and it is not here" % rel
+        assert (root / rel).exists(), "a document runs %s and it is not here" % rel
 
 
 def test_the_marker_file_carries_the_repository_name(root):

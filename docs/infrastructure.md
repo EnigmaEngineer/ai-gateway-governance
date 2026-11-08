@@ -107,23 +107,45 @@ until a container has started with it.
 
 ## The sweep, and the value it found
 
-Five values in `values.yaml` decide whether the gateway is reachable from the
-internet, whether the pods hold the node identity, and whether any pod in the
-cluster can reach the front door. Every one of them has a plausible setting
-and none of them produces an error when it is wrong. That is the same shape
-as the store round trip constant in the quota load run, which turned out to be
-setting the size of the effect it was measuring. So it got the same treatment.
+Six values in `values.yaml` decide four things. Whether the gateway is
+reachable from the internet. Whether the pods hold the node identity. Whether
+any pod in the cluster can reach the front door. And whether the hop to the
+model backend carries an identity. Every one of them has a plausible setting
+and none of them produces an error when it is wrong. That is the same shape as the store round
+trip constant in the quota load run, which turned out to be setting the size of
+the effect it was measuring. So it got the same treatment.
 
 `scripts/render_sweep.py` renders the chart at every combination and grades
 each rendering against the checks a reviewer would run by hand. Three arms,
-the same 32 combinations each.
+the same 96 combinations each.
 
 ```
                                    rendered  refused  findings  exposed and unacknowledged
-  the chart as it stands                  5       27         4                           0
-  without the acknowledgements            8       24         8                           2
-  with the refusal block emptied         32        0        64                           8
+  the chart as it stands                  9       87        12                           0
+  without the acknowledgements           16       80        24                           4
+  with the refusal block emptied         96        0       288                          24
 ```
+
+The backend hop was added on the last day of the build. The service had carried
+a client certificate for a day and the chart had carried none of it, so mutual
+TLS was in the test suite and not in the thing that would run. Three values for
+that dimension rather than two, because a boolean cannot express the half
+configured pairing the service refuses at startup.
+
+```
+                                   plaintext hop  of those unacknowledged  would not start
+  the chart as it stands                       4                        0                0
+  without the acknowledgements                 8                        4                0
+  with the refusal block emptied              32                       16               32
+```
+
+**32 of the 96 renderings the stubbed chart produces are a pod that cannot
+boot.** `gateway/app.py` refuses `--upstream-cert` without `--upstream-ca`, so
+the chart refuses the combination that would produce it. The first version of
+that grader read the flag names and found none of the 32, because emptying the
+CA key still renders the flag. What it renders is the mount directory with a
+trailing slash. A check reading argument names cannot see a path with no file
+behind it, so the grader reads the values.
 
 The middle arm is the guard as it was when this sweep first ran, and it is
 built from the current chart rather than remembered, so it reproduces every
@@ -147,13 +169,16 @@ rendering with a public address that nothing in its values asked for went from
 two to nought, and `tests/test_infra.py` asserts it stays at nought rather
 than asserting the other numbers.
 
-The four findings the sweep produces, each a configuration helm and terraform
+The seven findings the sweep produces, each a configuration helm and terraform
 both accept:
 
 - a LoadBalancer Service with no internal annotation, which gets a public address
 - a service account with no workload identity annotation, so pods hold the node identity
 - no NetworkPolicy, so any pod in the cluster can reach the gateway
 - a container image with no name
+- the guardrail passes no client certificate, so the hop to the backend has no identity
+- a certificate path passed with no filename behind it, which the service refuses at startup
+- a secret volume naming an empty key, which the API server rejects
 
 ## The control arm reported clean before it worked
 

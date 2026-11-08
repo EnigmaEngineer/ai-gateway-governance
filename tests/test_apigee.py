@@ -70,15 +70,26 @@ def test_the_defaults_are_still_flagged_as_edge_sourced():
 
 
 def test_the_unanswered_questions_are_still_recorded():
-    """Three things the vendor's pages did not settle.
+    """Eight things the vendor's pages did not settle.
 
     Each one is a place the bundle is arranged so the answer cannot change
     what is enforced. If one gets answered this list is the diff.
+
+    Five arrived with the token endpoint and one of them is a different kind
+    from the rest. Every other entry is a question about behaviour.
+    `oauthv2.client_secret_source` is a required input with no documented
+    source, which is an absence in the vendor's own reference rather than in
+    this bundle.
     """
     assert set(semantics.UNANSWERED) == {
         "responsecache.hit_skips_rest_of_request_flow",
         "oauthv2.verifyaccesstoken_checks_product_paths",
         "flow.no_conditional_matches",
+        "oauthv2.client_secret_source",
+        "oauthv2.generateaccesstoken_success_status",
+        "oauthv2.generateaccesstoken_needs_a_product",
+        "product.resource_path_with_two_base_paths",
+        "apiproxy.second_endpoint_must_be_listed",
     }
 
 
@@ -330,3 +341,128 @@ def test_the_blocked_apply_is_named_rather_than_implied():
     text = apigee_tf()
     assert "no GCP project" in text
     assert "has been applied" in text
+
+
+def token_endpoint():
+    return (BUNDLE / "proxies" / "token.xml").read_text(encoding="utf-8")
+
+
+def mint_policy():
+    return (BUNDLE / "policies" / "OA-GenerateToken.xml").read_text(encoding="utf-8")
+
+
+def test_something_in_the_bundle_mints_a_token():
+    """The gap. Verification shipped and nothing issued a token.
+
+    Asserted here as well as in the checker because this is the kind of
+    absence a reviewer notices and a schema never does.
+    """
+    text = without_comments(mint_policy())
+    assert "<Operation>GenerateAccessToken</Operation>" in text
+    assert "<GrantType>client_credentials</GrantType>" in text, (
+        "the mint has to name the grant, because the default is the two interactive ones")
+
+
+def test_the_mint_names_the_three_elements_whose_absence_is_the_default():
+    text = without_comments(mint_policy())
+    for element in ("SupportedGrantTypes", "ExpiresIn", "GenerateResponse"):
+        assert "<%s" % element in text, (
+            "%s is absent, and its default is the behaviour nobody chose" % element)
+    expires = re.search(r"<ExpiresIn>(-?\d+)</ExpiresIn>", text)
+    assert expires, "no ExpiresIn value to grade"
+    value = int(expires.group(1))
+    assert value > 0, (
+        "the page says any negative integer other than -1, and zero, causes a deployment "
+        "error, and this reads %d" % value)
+    assert value % 1000 == 0, (
+        "ExpiresIn is milliseconds and the response field is seconds, so a value that is "
+        "not a whole number of seconds publishes a lifetime nobody intended")
+
+
+def test_the_client_id_uses_the_only_supported_variable():
+    documented = semantics.value("oauthv2.clientid.only_supported_variable")
+    text = without_comments(mint_policy())
+    found = re.search(r"<ClientId>([^<]+)</ClientId>", text)
+    assert found, "the mint names no ClientId, so it falls back to a default nobody read"
+    assert found.group(1).strip() == documented, (
+        "the page says setting ClientId to any other variable is not supported, and this "
+        "reads %r" % found.group(1).strip())
+
+
+def test_the_undocumented_client_secret_source_is_recorded_rather_than_invented():
+    """The gap that is an absence in the vendor's reference.
+
+    A BasicAuthentication policy here would be configuration written on the
+    strength of the word `typically` in a fault table, which is inventing a
+    setting from a different source.
+    """
+    assert "oauthv2.client_secret_source" in semantics.UNANSWERED
+    # Read the root tag of every policy rather than its filename. A check on a
+    # name prefix passes on the same policy called something else, which is a
+    # check on a convention and not on the bundle.
+    import xml.etree.ElementTree as ET
+    kinds = sorted(ET.parse(path).getroot().tag
+                   for path in (BUNDLE / "policies").glob("*.xml"))
+    assert kinds, "no policies parsed, so this check graded nothing"
+    assert "BasicAuthentication" not in kinds, (
+        "a BasicAuthentication policy appeared and the page still does not say the mint "
+        "reads the secret from there: %r" % kinds)
+    assert "TODO" in mint_policy(), "the gap has to be named in the file a reader opens"
+
+
+def test_the_mint_endpoint_asks_for_no_credential_on_the_way_in():
+    """A caller must not need a token to get a token."""
+    text = without_comments(token_endpoint())
+    steps = re.findall(r"<Name>([^<]+)</Name>", text)
+    assert "OA-GenerateToken" in steps, "the mint is not on this endpoint's PreFlow"
+    for forbidden in ("OA-VerifyToken", "VJ-Tenant", "RF-NoExpiry", "Q-TenantBudget"):
+        assert forbidden not in steps, (
+            "%s runs before the mint, so nothing can reach it without already holding a "
+            "credential or a claim" % forbidden)
+
+
+def test_the_mint_endpoint_forwards_nothing():
+    text = without_comments(token_endpoint())
+    assert "<TargetEndpoint>" not in text, (
+        "a mint request carrying a client secret would reach the model backend")
+    assert re.search(r"<RouteRule [^>]*/>", text), (
+        "the documented null route is a self closing RouteRule and this endpoint has none")
+
+
+def test_neither_base_path_sits_inside_the_other():
+    """The reference does not say which endpoint wins, so neither overlaps."""
+    paths = []
+    for path in sorted((BUNDLE / "proxies").glob("*.xml")):
+        found = re.search(r"<BasePath>([^<]+)</BasePath>", without_comments(
+            path.read_text(encoding="utf-8")))
+        assert found, "%s declares no BasePath, which defaults to a bare slash" % path.name
+        paths.append(found.group(1).strip())
+    assert len(paths) == len(set(paths)), "a base path has to be unique in an environment"
+    for a in paths:
+        for b in paths:
+            if a is b:
+                continue
+            assert not b.startswith(a.rstrip("/") + "/"), (
+                "%s sits inside %s and the reference does not say which endpoint serves a "
+                "request in that case" % (b, a))
+
+
+def test_both_endpoints_keep_every_control_in_their_own_preflow():
+    for path in sorted((BUNDLE / "proxies").glob("*.xml")):
+        text = without_comments(path.read_text(encoding="utf-8"))
+        flows = re.search(r"<Flows\s*/>|<Flows>(.*)</Flows>", text, re.S)
+        assert flows, "%s has no Flows block" % path.name
+        body = flows.group(1) or ""
+        assert "<Step>" not in body, (
+            "%s puts a Step on a conditional flow, which some requests skip" % path.name)
+        pre = re.search(r"<PreFlow[^>]*>(.*?)</PreFlow>", text, re.S)
+        assert pre and "<Step>" in pre.group(1), (
+            "%s presents no PreFlow request path, so it is not graded" % path.name)
+
+
+def test_the_manifest_records_both_endpoints_and_the_null_route():
+    m = json.loads(CHECK.read_text(encoding="utf-8"))
+    assert m["graded"]["proxy_endpoints"] == 2, (
+        "the checker read %d endpoints" % m["graded"]["proxy_endpoints"])
+    assert m["graded"]["null_route_rules"] >= 1, (
+        "no endpoint routes nowhere, so nothing is standing in for the mint's null route")

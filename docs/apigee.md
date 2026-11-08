@@ -81,10 +81,77 @@ whose condition is true. Those three sentences are why every control in this
 bundle is in the PreFlow and why `scripts/policy_check.py` refuses a Step on a
 conditional flow.
 
+## The token endpoint, and why it is a second proxy endpoint
+
+`OA-VerifyToken` shipped before anything that issues a token, so a caller had
+to already hold one from somewhere this repository does not build. The
+verification half went first because it is the half that decides what gets
+through. That left a real gap rather than a reinterpretation of the plan. No
+gate here could see it either, because every rule in the checker reads an
+element that is present and asks whether its value is the one somebody chose.
+
+The mint could not go on the governed endpoint. Every control there sits in
+the PreFlow, which is what makes the enforcement readable off the file. A
+request that mints a token must not be asked for a token, and `Q-TenantBudget`
+is keyed on a claim out of the verified token, so on that path the identifier
+resolves to nothing. Putting the mint behind a condition was the obvious move
+and it breaks the one invariant the bundle is built on.
+
+So `apiproxy/proxies/token.xml` is a second `ProxyEndpoint` and it keeps every
+control in its own PreFlow. The configuration reference says a ProxyEndpoint
+name "Must be unique within the API proxy configuration, when (in rare cases)
+multiple ProxyEndpoints are defined", which is the page acknowledging the
+shape without recommending it. There is no `TargetEndpoint`, because "A null
+RouteRule can be defined to support scenarios in which the request message
+does not need to be forwarded to the TargetEndpoint" and a mint request
+carrying a client secret has no business reaching a model provider.
+
+Three elements on `OA-GenerateToken` are there because their absence is the
+behaviour nobody chose.
+
+**`SupportedGrantTypes` is Presence Required and the page still names a
+default.** "If no supported grant types are specified, then the only allowed
+grant types are `authorization_code` and `implicit`." A mint written without
+it refuses the one grant a service to service caller uses and deploys a
+browser redirect flow instead.
+
+**`ExpiresIn` is milliseconds and the response field is seconds.** The page
+says both, two sentences apart. Without the element "the system applies a
+default value configured at the system level" and the page gives no number
+for it, so the token's lifetime is not a value anybody here can state. This is
+the same factor of a thousand as the legacy claim variable family.
+
+**`GenerateResponse` defaults to false.** With it off the policy populates
+flow variables and hands the caller nothing, and every step still reports
+success. A mint that worked and returned no token is the hardest version of
+this to see.
+
+**The sharpest one is not a default at all.** `ClientId` has an element, a
+documented default of `request.formparam.client_id` and a sentence saying
+"Setting `ClientId` to any other variable is not supported". There is no
+element for the client secret and no sentence naming where it is read from.
+The only mention on the whole page sits in the `invalid_client` fault row,
+which says these values are "Typically, these values are sent as a Base64
+encoded Basic Authorization header". Typically is not a specification, so this
+bundle adds no `BasicAuthentication` policy on the strength of it and records
+the question instead. Every other gap on this page is a default somebody
+published. This one is a required input with no documented source.
+
+One more thing the vendor says about its own output. The token response carries
+`token_type` as `BearerToken`, and the page states that this is not RFC
+compliant. RFC 6750 spells the type `Bearer`. Nothing in a bundle changes the
+field, so a client matching it exactly against the RFC value refuses a token
+the platform has just minted.
+
+The checker gained eleven rules for all of this, including one that fires when
+a bundle verifies access tokens and nothing mints them. That rule exists
+because the gap was invisible to every gate here while it lasted.
+
 ## What the pages did not answer
 
-Three questions, recorded in `semantics.UNANSWERED` rather than guessed. In
+Eight questions, recorded in `semantics.UNANSWERED` rather than guessed. In
 each case the bundle is arranged so the answer cannot change what is enforced.
+Five of them arrived with the token endpoint.
 
 **Does a cache hit skip the rest of the request flow?** The page says the
 cached response returns with no request forwarded to the backend. It says
@@ -99,6 +166,30 @@ products carry explicit paths rather than a wildcard.
 
 **What happens when no conditional flow condition matches?** The flows page
 does not say. No control depends on the answer.
+
+**Where does the client secret come from?** Covered above. It is the one entry
+here that is an absence in the reference rather than a question about
+behaviour.
+
+**What HTTP status does a successful mint return, and is a target reached?**
+The page shows the JSON body and never says either. The null RouteRule makes
+the second half unanswerable in the direction that matters.
+
+**Does the app a mint is for have to hold an API product?** The page does not
+say, and the no product match fault is documented under verification rather
+than minting.
+
+**Which base path is a product's resource path relative to, now that this
+proxy has two?** The products page speaks of the base path in the singular.
+Splitting the mint onto its own endpoint moved this ambiguity into the product
+model, which is worth saying plainly. The mitigation is that no product names
+the mint path and nothing on that endpoint verifies a token.
+
+**Does a second ProxyEndpoint deploy when `APIProxy/ProxyEndpoints` does not
+name it?** The reference calls that element "simply a 'manifest' setting" and
+says you normally only see it on a proxy built in the management UI. The
+bundle names both endpoints, which is the reading that cannot be wrong in the
+direction that matters.
 
 ## These are Apigee Edge pages
 
@@ -152,10 +243,16 @@ problem. The render sweep's control arm failed sixteen renderings and reported
 clean for that reason.
 
 The first version of the sweep reported sixteen of sixteen rules fired. The
-checker has nineteen rules, so three were unmeasured and the summary said
+checker had nineteen rules then, so three were unmeasured and the summary said
 nothing about it. The sweep now reads the rule codes out of the checker's
 source and fails on any rule with no arm. A gate can be correct over the set
 it was handed when the set itself is the defect.
+
+The checker has 30 rules and the sweep has 30 arms, one per rule. 28 of the 30
+arms trip only their own rule. The two that do not both remove a Step from a
+PreFlow, which is also a rule, and that is reported rather than hidden. With
+every control stripped at once the checker reports 19 findings over 17
+distinct rules, which is more than any single arm produces.
 
 ## Reproducing both manifests
 

@@ -337,21 +337,33 @@ def test_the_published_sweep_table_matches_the_manifest(manifests, root):
         "with the refusal block emptied": "guard_stubbed",
     }
     m = manifests["helm-render"]
+    # The two tables are in docs/infrastructure.md. The README states the
+    # combination count and points at the document.
+    front = (root / "README.md").read_text(encoding="utf-8")
+    assert "%d combinations" % m["combinations"] in front, (
+        "the front page does not state the number of combinations the manifest holds")
+    text = (root / "docs/infrastructure.md").read_text(encoding="utf-8")
+    assert "%d combinations" % m["combinations"] in text, (
+        "the document does not state the number of combinations the manifest holds")
+    columns = {
+        "first": lambda c: [c["rendered"], c["refused"], c["findings_total"],
+                            c["exposed_renderings_nobody_acknowledged"]],
+        "second": lambda c: [c["renderings_with_a_plaintext_backend_hop"],
+                             c["plaintext_hops_nobody_acknowledged"],
+                             c["renderings_the_service_would_refuse_at_startup"]],
+    }
     graded = 0
-    for rel in ("README.md", "docs/infrastructure.md"):
-        text = (root / rel).read_text(encoding="utf-8")
-        assert "%d combinations" % m["combinations"] in text, (
-            "%s does not state the number of combinations the manifest holds" % rel)
-        for label, key in rows.items():
-            line = next((l for l in text.splitlines() if l.strip().startswith(label)), None)
-            assert line, "%s has no row for %s" % (rel, label)
+    for label, key in rows.items():
+        lines = [l for l in text.splitlines() if l.strip().startswith(label)]
+        assert len(lines) == 2, (
+            "the document should carry %r in both tables and it appears %d times"
+            % (label, len(lines)))
+        for line, which in zip(lines, ("first", "second")):
             numbers = [int(n) for n in line.split()[len(label.split()):]]
-            c = m[key]
-            expected = [c["rendered"], c["refused"], c["findings_total"],
-                        c["exposed_renderings_nobody_acknowledged"]]
+            expected = columns[which](m[key])
             assert numbers == expected, (
-                "%s row %r reads %s and the manifest says %s"
-                % (rel, label, numbers, expected))
+                "the %s table row %r reads %s and the manifest says %s"
+                % (which, label, numbers, expected))
             graded += 1
     assert graded == 6, "expected two tables of three rows and graded %d" % graded
 
@@ -362,3 +374,80 @@ def test_the_sweep_found_the_four_findings_it_was_written_for(manifests):
     found = " | ".join(m["distinct_findings"])
     for w in wanted:
         assert w in found, "the sweep never produced a finding about %s" % w
+
+
+# The client identity on the backend hop.
+
+def chart_text(name):
+    return (CHART / name).read_text(encoding="utf-8")
+
+
+def test_the_deployment_passes_all_three_tls_flags_or_none():
+    """gateway/app.py refuses --upstream-cert without --upstream-ca at startup.
+
+    A template that can render two of the three renders a pod that will not
+    boot, and helm lint cannot see it. The flags therefore sit inside one
+    conditional block rather than three.
+    """
+    text = chart_text("templates/deployment.yaml")
+    block = re.search(r"\{\{-\s*if\s+\.Values\.upstreamTls\.enabled\s*\}\}(.*?)\{\{-\s*end\s*\}\}",
+                      text, re.S)
+    assert block, "no conditional block carries the upstream TLS flags"
+    body = block.group(1)
+    for flag in ("--upstream-ca", "--upstream-cert", "--upstream-key"):
+        assert flag in body, "%s is outside the block that keeps the three together" % flag
+
+
+def test_the_chart_carries_the_client_identity_the_service_has():
+    """The service carried mutual TLS before the chart did."""
+    values = chart_text("values.yaml")
+    assert "upstreamTls:" in values, "the values file names no client identity"
+    assert re.search(r"^\s*enabled:\s*true\s*$", values, re.M), (
+        "the identity ships off, so the chart as it stands deploys a plaintext hop")
+    deployment = chart_text("templates/deployment.yaml")
+    assert "name: upstream-tls" in deployment, "nothing mounts the certificate"
+    assert "defaultMode: 256" in deployment, (
+        "the private key is mounted at the default mode, which every process in the pod "
+        "can read")
+
+
+def test_turning_the_identity_off_takes_an_acknowledgement():
+    """Same shape as internet exposure and the network policy."""
+    helpers = chart_text("templates/_helpers.tpl")
+    assert "acknowledgePlaintextBackendHop" in helpers, (
+        "a plaintext backend hop renders with no second value saying so")
+    conditions = re.findall(r"\{\{- if [^\n]*\n\{\{- fail [^\n]*\n\{\{- end -\}\}\n", helpers)
+    acks = [c for c in conditions if "acknowledge" in c]
+    assert len(acks) == 3, (
+        "three values expose something and have a plausible default, and %d of them take "
+        "an acknowledgement" % len(acks))
+
+
+def test_the_sweep_covers_the_backend_identity_as_its_own_dimension(manifests):
+    m = manifests["helm-render"]
+    assert "upstream_client_identity" in m["dimensions"], (
+        "the chart grew a client identity and the sweep does not vary it")
+    assert len(m["dimensions"]["upstream_client_identity"]) == 3, (
+        "a boolean cannot express the half configured pairing, so this dimension has three "
+        "values and the manifest holds %r" % m["dimensions"]["upstream_client_identity"])
+
+
+def test_the_guard_refuses_every_rendering_the_service_would_not_boot_from(manifests):
+    m = manifests["helm-render"]
+    assert m["guarded"]["renderings_the_service_would_refuse_at_startup"] == 0, (
+        "the chart rendered %d pods that cannot start"
+        % m["guarded"]["renderings_the_service_would_refuse_at_startup"])
+    assert m["guard_stubbed"]["renderings_the_service_would_refuse_at_startup"] > 0, (
+        "with the guard removed nothing rendered a pod that cannot start, so the guard is "
+        "measured against an arm that had nothing to catch")
+
+
+def test_no_plaintext_backend_hop_renders_without_somebody_saying_so(manifests):
+    """The invariant. The other counts in that table are context."""
+    m = manifests["helm-render"]
+    assert m["guarded"]["plaintext_hops_nobody_acknowledged"] == 0, (
+        "%d renderings reach the backend with no identity and nothing in their values asked "
+        "for it" % m["guarded"]["plaintext_hops_nobody_acknowledged"])
+    assert m["guard_without_acknowledgements"]["plaintext_hops_nobody_acknowledged"] >= 1, (
+        "the guard without the acknowledgements let none through, which is the whole claim "
+        "about what the third one is worth")

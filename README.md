@@ -12,6 +12,10 @@ curl -s localhost:8080/v1/guard -d '{"text":"Patient: Rosa Delacroix, MRN 884213
 curl -sN localhost:8080/v1/guard/stream -d '{"text":"Patient: Rosa Delacroix, MRN 884213"}'
 ```
 
+This page says what the thing is and what it does not do. Every measurement
+sits in `docs/`, indexed at the bottom, after this page grew from 278 lines to
+365 one defensible addition at a time.
+
 ## How a request moves through it
 
 ```
@@ -40,144 +44,17 @@ curl -sN localhost:8080/v1/guard/stream -d '{"text":"Patient: Rosa Delacroix, MR
 time, so a deployment whose two sets do not partition the eighteen classes
 fails to start rather than passing a whole category silently.
 
-## What it measures
+## The two numbers worth leading with
 
-Every figure below is a pair of counts from a run on this machine. The commands
-that produced them are under the table and the manifests are in
-`measurements/`. `tests/test_readme.py` re-derives each one and fails with the
-correct value in the message.
+On a held out slice of 400 generated rows the detectors find 272 of 281
+identifiers and 146 of 152 planted attacks. Then the patterns were frozen and
+attacked on purpose, and 20 of 22 evasion attempts walked through.
 
-| | identifier recall | identifier precision | attack recall | attack precision |
-|---|---|---|---|---|
-| held out slice, 400 rows | 272 / 281 | 286 / 286 | 146 / 152 | 146 / 151 |
-| crude floor, same rows | 99 / 281 | 99 / 114 | 27 / 152 | 27 / 40 |
-
-```
-python corpus/generate.py --seed 23 --rows 400 --out corpus/data/labelled-holdout.jsonl
-python scripts/score.py --corpus corpus/data/labelled-holdout.jsonl --label holdout --out measurements/holdout-patterns.json
-python scripts/score.py --corpus corpus/data/labelled-holdout.jsonl --label holdout --baseline --out measurements/holdout-baseline.json
-python scripts/score.py --corpus corpus/data/labelled-dev.jsonl --label development --out measurements/development-patterns.json
-```
-
-The precision column is the weakest figure here and a perfect score should be
-read as one. It says no prediction landed outside a labelled identifier on
-these 400 rows, and the rows carrying no identifiers are 12 phrases written to
-be plausible rather than adversarial. One was missing until a timestamp
-turned out to redact as an address, which is covered below.
-
-The floor row is a deliberately crude detector. Any run of five or more digits
-is an identifier and three keywords stand in for the attack patterns. It is the
-only figure here that nothing was fitted to.
-
-All five false positives on the attack side are payloads that describe an attack
-instead of attempting one. The service blocks them and attaches a note saying
-so, rather than clearing them, because a filter an attacker switches off by
-writing `for instance` is worth nothing.
-
-Both slices come from the same generator. The patterns were written from the
-class definitions before either slice was read, and the three defects found
-afterwards were found by reading the development slice at seed 11 and never the
-scored one at seed 23. So the table says the patterns generalise across draws
-of one generator. It does not say they generalise across writing styles.
-
-## The number that says what a stranger gets through
-
-The patterns were frozen and then twenty two evasion attempts were written with
-the pattern file open. Twenty of them still get through.
-
-```
-python scripts/evade.py --out measurements/evasion.json
-```
-
-That is a lower bound rather than an estimate, because the attempts were
-written by somebody holding the implementation. The gap between the table above
-and this paragraph is not a measurement error. Both are correct and they
-measure different things. `docs/evasion.md` groups the twenty by what they
-exploit and only one of the four groups is a pattern problem.
-
-## Redacting a streamed response
-
-A completion arrives a few tokens at a time and redacting each chunk on its own
-leaks every identifier that straddles a boundary. `gateway/stream.py` holds the
-tail back until enough has followed it to decide, and `/v1/guard/stream` is the
-same guardrail over a chunked response.
-
-```
-python scripts/stream_sweep.py --out measurements/stream-buffers.json
-```
-
-The plan for this called the buffer one number. It is three. The second one is
-where the identifiers go and the third one is what stops a single long link
-turning one request into a scan that is quadratic in its own length.
-
-```
-holdback  lookbehind  leaked  diverged
-      64           0     124        34
-      64           4      60        28
-      64           8      51        28
-      64          16       0         1
-```
-
-A holdback of 64 characters is twice what the leak curve needs on its own and
-it still loses 124 of 281 identifiers when nothing of the already emitted text
-stays in the matching window. Most of the enforced classes are labelled, and a
-label that has already gone out to the reader cannot introduce the value that
-follows it. The full curves and the measured cost are in `docs/streaming.md`.
-
-## The token budget, and what deciding early costs
-
-A gateway says yes or no before it knows what a request will cost. Admission
-charges an estimate and reconciliation replaces it with the usage the provider
-reported, so a tenant can finish a window having spent more than its budget.
-The amount is a quantity the design owns rather than a bug.
-
-Measured against 240 held out bodies on a budget of 6,808 tokens. The load ran
-at 16 concurrent callers over three repeats.
-
-```
-  prompt_estimator_short_by_tokens          882 to    891, median    882 over 3 runs
-  forecast_short_by_tokens                 3478 to   3507, median   3478 over 3 runs
-  overshoot_under_forecast_tokens           117 to    171, median    117 over 3 runs
-```
-
-Reserving the whole declared output ceiling is sound and it holds budget the
-caller will not use. Forecasting a quarter of it took the shortfall from about
-882 tokens to about 3,478. The shortfall is a sum over every settled request
-and it barely moves. The overshoot is one number off one interleaving and it
-moves by multiples, so both are published as a spread.
-
-Under the ceiling policy the estimator was short by about 882 tokens and the
-budget was overspent by nought, because 67 of the 240 bodies are blocked by the
-injection filter and each hands its whole reservation back unspent. That slack
-belongs to the traffic and not to the quota.
-
-**Dropping the critical section around the counter is free in one process and
-total the moment the counter is a network hop away.** Two callers read the same
-counter and each writes its own total over the other's, so the reservation
-never accumulates. How often that happens is a function of how far apart the
-read and the write are, so the load run sweeps that width with a locked control
-at each one.
-
-```
-  round trip 0        admitted without the lock  177  with it  176
-  round trip 0.0002   admitted without the lock  238  with it  177
-  round trip 0.0005   admitted without the lock  240  with it  175
-  round trip 0.002    admitted without the lock  240  with it  176
-```
-
-With no artificial window the unserialised arm admits about what the locked one
-admits. Open two tenths of a millisecond, which is less than any shared counter
-costs, and the quota stops refusing almost anything. The first draft of this
-section said the lock was load bearing full stop. The sweep is the only reason
-it does not say that.
-
-Detection is linear in payload size, so `Admission` caps how many requests are
-in it at once and refuses rather than queues. Caps of 2, 4, 8 and 16 at 16
-workers take the served median from 27.6 ms to 140.1 ms on two cores. Anything
-below 16 refuses about nine requests in ten. That is a step and the harness put
-it there, because a closed loop generator with 16 workers offers 16 concurrent
-requests and no more. The sweep says what a cap costs and cannot
-choose one. `docs/quota.md` carries the tables and the argument.
+Both are correct and they answer different questions. The first is an upper
+bound, because the same person wrote the class definitions and the generator.
+The second is a lower bound, because the attempts were written with the
+pattern file open. Neither one alone is honest. `docs/scoring.md` and
+`docs/evasion.md` have the breakdown.
 
 ## Known limitations
 
@@ -203,7 +80,7 @@ choose one. `docs/quota.md` carries the tables and the argument.
   is the shape of a clinical timestamp and of an address, and the pattern took
   both while splitting a real compressed address in half. Fixed, and the
   negatives that should have caught it are in the set now.
-- **Streaming costs about 48 times the whole body redactor** over the same
+- **Streaming costs about 49 times the whole body redactor** over the same
   text, because the patterns are re-run on every chunk. Draining less often
   would cut it and would also move the leak curve, so it is a third dimension
   and nothing has measured it.
@@ -215,8 +92,7 @@ choose one. `docs/quota.md` carries the tables and the argument.
   cap should be. That needs an open loop generator with an arrival rate.
 - **`MAX_BODY` is still a megabyte and nothing measured what a real payload
   needs.** The largest body either corpus slice carries is 233 characters,
-  which is a fact about a generator. Lowering the limit to make the worst case
-  look better would be choosing a bound from the sample it is judged on.
+  which is a fact about a generator.
 - **The reference tokeniser never merges, so it is at least as dear as the
   character rule on every input.** A real vocabulary is cheaper on long common
   words, so every shortfall figure here is a bound on what a real tokeniser
@@ -224,6 +100,15 @@ choose one. `docs/quota.md` carries the tables and the argument.
 - **The upstream honours the output ceiling and the quota window never
   rolls.** So one term of the overshoot is absent, and a budget is a counter
   with no clock on it, no refill and no sliding window.
+- **Nothing here has been applied to a cloud project.** The Terraform, the
+  Helm chart and the Apigee bundle are graded by rendering and by reading, and
+  no resource has ever existed. So the Apigee defaults are read off the Edge
+  documentation rather than confirmed on Apigee X, and the chart's mounted
+  paths are unverified against a container that started.
+- **The token endpoint reads the client secret from somewhere the vendor does
+  not document.** `ClientId` has an element and a stated default and a
+  sentence saying no other variable is supported. There is no element for the
+  secret and no sentence naming its source.
 
 ## What I would do differently
 
@@ -233,133 +118,95 @@ was wrong. It took freezing the patterns and attacking them on purpose to find
 out that the figure was an upper bound. The evasion pass costs about forty
 lines and it should have been the first thing built rather than the last.
 
+The second one is the same mistake elsewhere. Four of the seven days wrote
+configuration for somebody else's product, and on three of them the finding
+was a default nobody had chosen rather than a value anybody got wrong. On the
+one day the vendor's pages were read first, it changed the architecture before
+the chart existed instead of after.
+
 ## Where it runs
 
-A private GKE cluster and the gateway behind an internal load balancer, in
-`terraform/` and `helm/`. None of it has been applied, because there is no
-project yet.
+A private GKE cluster with the gateway behind an internal load balancer, and
+an Apigee X proxy in front of it. None of it has been applied, because there
+is no project yet.
 
 `terraform validate` and `helm lint` both pass without credentials and neither
 can see a configuration that is valid and wrong. So the chart is rendered at
-all 32 combinations of the five values that decide whether the gateway is
-exposed, in three arms, and every rendering is graded.
+all 96 combinations of the six values that decide whether the gateway is
+exposed or has an identity, in three arms, and every rendering is graded.
 
-```
-                                   rendered  refused  findings  exposed and unacknowledged
-  the chart as it stands                  5       27         4                           0
-  without the acknowledgements            8       24         8                           2
-  with the refusal block emptied         32        0        64                           8
-```
+The detector sits in front of the proxy rather than behind it as a webhook,
+because Portkey takes the webhook's address from a request header and a
+detector behind it runs when the caller asks for it. Both are in
+`docs/infrastructure.md`.
 
-The middle arm is the chart's own refusal as it was first written. It caught
-every empty value and let through two renderings with a public address,
-because the value that exposes the service ships as `true` rather than empty.
+## The Apigee layer
 
-The detector sits in front of the proxy, not behind it as a webhook. Portkey
-takes the webhook's address from an account in its own application or from a
-request header, so a detector behind it runs when the caller asks for it.
-`docs/infrastructure.md` has that, and the three environment variables the
-first chart invented.
+One governed front door in front of the guardrail, as a proxy bundle in
+`apiproxy/` with its infrastructure in `terraform/apigee.tf`.
+
+Most of an Apigee policy's security behaviour is decided by elements you leave
+out. A `Quota` with no `Distributed` counts per message processor, so a budget
+of 2000 is 2000 times the processor count. A `VerifyJWT` with no `Issuer`
+verifies a signature and nothing about who signed it. Both deploy and
+`terraform validate` cannot see either one.
+
+So `apigee/semantics.py` carries 38 documented defaults, each with the
+sentence it came from and its URL, and `scripts/policy_check.py` refuses to
+write a rule on a default that is not in there. `scripts/bundle_sweep.py` then
+breaks the bundle 30 ways, one per rule, and fails if any rule does not fire
+or if any rule has no arm built to trip it. With every control stripped at
+once the checker reports 19 findings over 17 distinct rules.
+
+The bundle has two proxy endpoints, the governed path and the token mint, each
+keeping every control in its own PreFlow. `docs/apigee.md` has the sourced
+quotes, the five questions the vendor's pages did not answer, and why the mint
+got an endpoint rather than a flow.
+
+## The hop to the backend, and the two headers that retire a version
+
+The gateway presents a client certificate to the backend, the backend refuses
+anything else, and the version a caller asked for decides what it gets.
+
+`ssl.create_default_context(Purpose.CLIENT_AUTH)` is the call you build a
+server with and it leaves `verify_mode` at `CERT_NONE`. So a backend built the
+obvious way serves real TLS, presents a real certificate, and accepts a caller
+presenting nothing. Every tool that reports a cipher says it is fine.
+
+A failover time is not one number either. Against a primary still accepting
+connections and no longer answering, the median is the attempt timeout to
+within about two milliseconds at every width swept. Against one whose listener
+is gone the timeout never appears in it at all.
+
+`Deprecation` and `Sunset` do not share a date format. RFC 9745's own worked
+example of the pair writes the zone as `UTC`, which the HTTP-date grammar
+refuses, so copying the authority produces a broken field.
 
 ## Layout
 
 ```
 gateway/      policy enumeration, detectors, the request decision, the quota, HTTP front door
 corpus/       the seeded generator, the two labelled slices, response bodies
-scripts/      scoring, the evasion pass, the buffer sweep, the quota load run, the render sweep
+scripts/      scoring, the evasion pass, the buffer sweep, the quota load run, the two config sweeps
 measurements/ counts manifests, one per scored run
-docs/         scoring, declared omissions, evasion, streaming, the quota, the cluster
-terraform/    budget alert, network, private cluster, the two identities
+docs/         every measurement and the argument behind it
+apiproxy/     the Apigee bundle, two proxy endpoints and seven policies
+terraform/    budget alert, network, private cluster, Apigee, the two identities
 helm/         Portkey and the guardrail in one pod, behind an internal load balancer
 ```
-
 
 Nothing in `corpus/data` came from a real record. Every value is generated, so
 the labelled slices are committed whole rather than withheld.
 
-## The Apigee layer
+## Measured, in full
 
-One governed front door in front of the guardrail, as an Apigee X proxy bundle
-in `apiproxy/` and its infrastructure in `terraform/apigee.tf`. Nothing is
-applied, because there is no GCP project yet.
-
-Most of an Apigee policy's security behaviour is decided by elements you leave
-out. A `Quota` with no `Distributed` counts per message processor, so a budget
-of 2000 is 2000 times the processor count. A `VerifyJWT` with no `Issuer`
-verifies a signature and nothing about who signed it. A `ResponseCache` with
-no caller in its key serves one tenant's completion to another. All three
-deploy and `terraform validate` cannot see any of them.
-
-So `apigee/semantics.py` carries 25 documented defaults, each with the sentence
-it came from and its URL, and `scripts/policy_check.py` refuses to write a rule
-on a default that is not in there. `scripts/bundle_sweep.py` then breaks the
-bundle 19 ways, one per rule, and fails if any rule does not fire or if any
-rule has no arm built to trip it. With every control stripped at once the
-checker reports 14 findings over 12 distinct rules.
-
-`VerifyJWT` is the sharpest one. Expiry is checked only when the claim is
-present, and the element that could require a claim refuses registered names,
-`exp` among them. So the policy admits a token that never expires and has no
-setting that refuses it. `RF-NoExpiry` is a separate step for that reason.
-
-The argument is in `docs/apigee.md` with the 25 sourced quotes. It also carries
-the three questions the vendor's pages did not answer and why these are Edge
-pages rather than X pages.
-
-## The hop to the backend, and the two headers that retire a version
-
-Three things landed together because they are all the same hop. The gateway
-presents a client certificate to the backend, the backend refuses anything
-else, and the version a caller asked for decides what it gets.
-
-### Mutual TLS, and the default that is not mutual
-
-`ssl.create_default_context(Purpose.CLIENT_AUTH)` is the call you build a
-server with and it leaves `verify_mode` at `CERT_NONE`. The same call for a
-client gives `CERT_REQUIRED`. So a backend built the obvious way serves real
-TLS, presents a real certificate, and accepts a caller presenting nothing.
-Every tool that reports a cipher says it is fine.
-
-`measurements/mtls.json` runs seven arms and two of them completed the TLS
-handshake and were refused afterwards. Both are cases where the server rejects
-the client, and under TLS 1.3 that verdict arrives after `wrap_socket` has
-already returned. A probe reading the handshake alone reports a refusal as a
-success. The two arms that do fail at the handshake are the two where the
-client rejects the server.
-
-Every refusal in that table sits beside a control that got through for the
-mirrored reason. The two no certificate arms differ only in the server's
-`verify_mode`. The two wrong name arms differ only in the client's
-`check_hostname`. `docs/mtls.md` has the table and what it does not cover.
-
-### Failover, measured across the constant that decides it
-
-A failover time is not one number. Against a primary whose listener is gone it
-is about seven tenths of a millisecond on this machine and the attempt timeout
-never appears in it. Against a primary still accepting connections and no
-longer answering, the median is the timeout to within about two milliseconds,
-at every one of four widths swept. A breaker at three consecutive failures
-drops that back under a millisecond by asking the dead provider three times
-instead of forty.
-
-Counts are in `measurements/failover.json`, sixteen arms plus one with both
-providers down so that `requests_lost` is a column the sweep produced rather
-than a zero. The wall times are in `docs/failover.md` rather than the manifest,
-because a count re-derives on another machine and a millisecond does not.
-
-### Versioning
-
-`v1` charges a chat request that declares no `max_output_tokens` against a
-default of 256. `v2` refuses it and names the field, which is a breaking change
-and the reason there is a deprecation window rather than a changelog entry.
-
-The registry in `gateway/versioning.py` is an allow list, so `/v3/chat` and an
-unversioned `/chat` are both refused with the list of versions that exist. A
-prefix rule would have routed either one to whatever is current.
-
-`Deprecation` and `Sunset` travel together and do not share a format. One is a
-Structured Fields date, `@1790812800`. The other is an HTTP-date ending in the
-literal `GMT`. RFC 9745's own worked example of the pair writes that zone as
-`UTC`, which the HTTP-date grammar refuses, so copying the authority produces a
-broken field. `docs/versioning.md` has the four one-line spellings and which
-two of them are wrong.
+- `docs/scoring.md` the held out table, the crude floor, and why a perfect precision column is the weakest figure here
+- `docs/evasion.md` the 22 attempts grouped by what they exploit
+- `docs/policy-omissions.md` the three Safe Harbor classes with no detector
+- `docs/streaming.md` the three buffers, the leak curves and the measured cost
+- `docs/quota.md` the estimate and reconcile spreads, the round trip sweep, the admission cap
+- `docs/infrastructure.md` the cluster, the chart and the 96 rendering sweep
+- `docs/apigee.md` the sourced defaults, the bundle sweep and the two endpoints
+- `docs/mtls.md` the seven arms and the refusal that arrives after the handshake
+- `docs/failover.md` the sixteen arms and the constant that decides the cost
+- `docs/versioning.md` the four spellings of a sunset date and which two are wrong
